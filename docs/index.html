@@ -1,126 +1,836 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Operation FSI</title><style>
-:root{--b:#0c1020;--c:#171d35;--l:#344064;--i:#f1f4ff;--m:#60e6bd;--g:#ffd166;--u:#aeb8d5;font-family:Inter,system-ui,sans-serif}*{box-sizing:border-box}body{margin:0;background:radial-gradient(900px 600px at 4% -8%,#322969,transparent 65%),var(--b);color:var(--i)}.app{max-width:1180px;margin:auto;padding:20px}.head{display:flex;justify-content:space-between;gap:15px;border-bottom:1px solid var(--l);padding:5px 0 17px}.logo{font-weight:950;letter-spacing:.14em;color:var(--m)}small,.mut{color:var(--u)}.stats{display:flex;gap:14px}.stat{font-size:.7rem;color:var(--u)}.stat b{display:block;color:var(--i);font-size:1rem}.nav,.actions{display:flex;gap:8px;flex-wrap:wrap}.nav{margin:18px 0}button,textarea{font:inherit}button{border:0;border-radius:10px;padding:10px 14px;background:var(--m);color:#09251d;font-weight:800;cursor:pointer}button.alt{background:#303957;color:var(--i)}button.gold{background:var(--g);color:#332800}.nav button{background:transparent;border:1px solid var(--l);color:var(--u)}.nav button.active{border-color:var(--m);color:var(--m)}.view{display:none}.view.active{display:block}.layout{display:grid;grid-template-columns:260px 1fr;gap:18px}.card{background:linear-gradient(145deg,#1d2442,#14192d);border:1px solid var(--l);padding:20px;border-radius:18px}.topic{width:100%;display:block;text-align:left;background:transparent;color:var(--u);padding:9px}.topic.active{background:#293253;color:var(--m)}.tag{display:inline-block;border-radius:20px;padding:4px 9px;background:#302c51;color:#d5cbff;font-size:.72rem;font-weight:800}.timer{float:right;color:var(--g);font-weight:800}.bar{height:9px;border-radius:9px;background:#303957;overflow:hidden;margin:15px 0}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--m),#7aa9ff);transition:.2s}.steps{display:flex;gap:5px;overflow:auto}.step{min-width:105px;color:var(--u);font-size:.75rem;border-bottom:3px solid var(--l);padding:8px 3px}.step.on{border-color:var(--m);color:var(--m)}.step.done{border-color:var(--g);color:var(--g)}h1{font-size:clamp(1.5rem,4vw,2.5rem);margin:14px 0}.sentence{font-size:clamp(1.35rem,3vw,2.25rem);line-height:1.35;margin:22px 0}.prompt{padding:13px;border-left:4px solid #79a7ff;background:#11162a;border-radius:8px;margin:12px 0}.answer{width:100%;min-height:90px;background:#0e1323;color:var(--i);border:1px solid var(--l);border-radius:10px;padding:12px;margin-top:12px}.feedback{padding:12px;border-radius:9px;background:#19382f;color:#d6ffec;margin-top:12px}.bad{background:#412833;color:#ffe0e4}.drills,.map,.kpis{display:grid;gap:10px}.drills{grid-template-columns:repeat(2,1fr)}.drill{background:#151a2e;color:var(--i);text-align:left;border:1px solid var(--l)}.drill.selected{outline:2px solid var(--m)}.map{grid-template-columns:repeat(3,1fr)}.node,.kpi{background:#151a2e;border:1px solid var(--l);border-radius:11px;padding:13px;color:var(--u)}.node.open{border-color:var(--m);color:var(--i)}.kpis{grid-template-columns:repeat(3,1fr)}.heat{display:grid;grid-template-columns:repeat(14,1fr);gap:5px}.heat i{aspect-ratio:1;background:#29324e;border-radius:3px}.heat i.on{background:var(--m)}.hide{display:none!important}@media(max-width:750px){.layout{grid-template-columns:1fr}.side{display:none}.map{grid-template-columns:repeat(2,1fr)}.kpis{grid-template-columns:repeat(2,1fr)}.app{padding:13px}.stats{gap:7px}.drills{grid-template-columns:1fr}}</style></head><body><main class="app"><header class="head"><div><div class="logo">⚡ OPERATION FSI</div><small>Canadian life · American English · B1 → B2</small></div><div class="stats"><div class="stat">LEVEL<b id="level">1</b></div><div class="stat">EXP<b id="xp">0</b></div><div class="stat">STREAK<b id="streak">1 day</b></div><div class="stat">TODAY<b id="time">00:00</b></div></div></header><nav class="nav"><button class="active" data-view="train">TRAIN</button><button data-view="map">GROWTH MAP</button><button data-view="review">MISTAKE BOOK</button><button data-view="plan">6H PLAN</button><button data-view="library">CONTENT</button></nav>
-<section id="train" class="view active"><div class="layout"><aside class="card side"><b>12-zone campaign</b><div id="topics"></div><p class="mut">50 core lines per zone · six FSI drills per line · local progress.</p></aside><section class="card"><span class="tag" id="tag"></span><span class="timer" id="clock">00:00</span><h1 id="title"></h1><div class="mut" id="count"></div><div class="bar"><i id="bar"></i></div><div class="steps" id="steps"></div><div id="lesson"></div></section></div></section>
-<section id="map" class="view"><section class="card"><h1>Growth map</h1><p class="mut">Every zone contains 50 core lines and a Boss mission. Earn 180 EXP to unlock the next zone.</p><div class="map" id="mapNodes"></div><h3>Last 56 training days</h3><div class="heat" id="heat"></div></section></section>
-<section id="review" class="view"><section class="card"><h1>Mistake book</h1><p class="mut">Answers below 75% return tomorrow for spaced review.</p><div id="mistakes"></div></section></section>
-<section id="plan" class="view"><section class="card"><h1>Daily intensive plan</h1><p class="mut">4 × 90 minute sessions plus 20 minutes of correction. Start at 20 minutes and build consistency.</p><div class="kpis" id="blocks"></div><div class="actions"><button id="start">Start focus block</button><button class="alt" id="pause">Pause and save</button></div><p id="focus" class="feedback hide"></p></section></section>
-<section id="library" class="view"><section class="card"><h1>Extensible content pack</h1><p class="mut">Import extra lessons as JSON: theme, level, base, hint. The current campaign generates 600 core lessons from safe Canadian-life patterns.</p><textarea class="answer" id="importBox" placeholder='[{"theme":"Classroom & homework","level":"B1","base":"I need more time to finish this.","hint":"我需要更多时间完成。"}]'></textarea><div class="actions"><button id="import">Import</button><button class="alt" id="export">Export progress</button><button class="alt" id="reset">Reset data</button></div><p id="message" class="mut"></p></section></section></main>
-<script>
-var $=function(s){return document.querySelector(s)},steps=['Listen','Shadow','Cloze','Recall','Check','6 Drills','Boss'];
-var themes=[['Classroom & homework','B1','ask the teacher','finish the assignment','after class','I want to understand the instructions','课堂、作业与提问'],['Campus life','B1','find the student office','join the club','before lunch','I want to meet new people','校园与社团'],['Host family','B1','use the washroom','help with the dishes','after dinner','I want to be respectful','寄宿家庭'],['Friends & small talk','B1','hang out this weekend','get to know you better','after school','it sounds fun','交友与闲聊'],['Shopping & food','B1','get this to go','try the lunch special','at Tim Hortons','I am in a hurry','购物与点餐'],['Transportation','B1','catch the next bus','get downtown','before eight','I do not want to be late','公交与出行'],['Health & care','B1+','make an appointment','describe my symptoms','since yesterday','I need some advice','看病与药房'],['Banking & housing','B1+','open a student account','ask about the rent','this afternoon','I need to plan my budget','银行与租房'],['Part-time work','B2','apply for the position','confirm my availability','on weekday evenings','I am reliable','兼职与面试'],['Exams & study','B1+','review this chapter','explain my reasoning','before the test','I want to improve my grade','考试与学习'],['Activities & hobbies','B1','try photography','practice with the team','on Saturday','I enjoy learning new skills','兴趣与活动'],['Opinions & culture','B2','share my point of view','consider another perspective','during the debate','the issue is more complex than it seems','观点与文化']];
-var american={colour:'color',centre:'center',favourite:'favorite',organise:'organize',aluminium:'aluminum'},S;try{S=JSON.parse(localStorage.operationFSI)}catch(e){}S=S||{xp:0,topic:0,index:0,stage:0,seconds:0,mistakes:[],days:{},custom:[],mastery:{}};var focusStart=0,rec;
-function save(){localStorage.operationFSI=JSON.stringify(S);stats()}function allLines(t){var x=themes[t],forms=[['Could you help me ','?'],['I need to ',' ' + x[4] + '.'],['I am trying to ','.'],['Would it be okay if I ','?'],['I plan to ',' because ' + x[5] + '.'],['I am not sure how to ','.'],['I would appreciate help with ','.'],['I have been working on this ','.'],['From my point of view, ',' is important.'],['Could you repeat that more slowly?','']];return Array.from({length:50},function(_,i){var f=forms[i%10],act=i%2?x[3]:x[2];return{id:t+'-'+i,theme:x[0],level:x[1],base:f[0]+act+f[1],hint:x[6]+' · '+(i+1)+'/50',a:x[2],b:x[3],time:x[4],reason:x[5]}})}
-function line(){return allLines(S.topic)[S.index%50]}function words(s){return String(s).toLowerCase().replace(/[.,!?;:'"]/g,'').split(/\s+/).map(function(x){return american[x]||x}).filter(Boolean)}function grade(a,b){var x=words(a),y=words(b),used={},hit=0;x.forEach(function(w){var i=y.findIndex(function(z,n){return z===w&&!used[n]});if(i>=0){used[i]=1;hit++}});return{n:Math.round(hit*100/Math.max(1,y.length)),y:y,used:used}}function speak(t,r){speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=r||1;var v=speechSynthesis.getVoices().find(function(x){return /en-US/i.test(x.lang)});if(v)u.voice=v;speechSynthesis.speak(u)}
-function stats(){var m=Math.floor(S.seconds/60);$('#level').textContent=Math.floor(S.xp/180)+1;$('#xp').textContent=S.xp;$('#streak').textContent=Math.max(1,Object.keys(S.days).length)+' days';$('#time').textContent=String(m).padStart(2,'0')+':'+String(S.seconds%60).padStart(2,'0')}
-function topics(){$('#topics').innerHTML=themes.map(function(t,i){return '<button class="topic '+(i===S.topic?'active':'')+'" data-topic="'+i+'" '+(i>Math.floor(S.xp/180)?'disabled':'')+'>'+ (i+1)+'. '+t[0]+'<br><small>'+t[1]+' · 50 lines</small></button>'}).join('');document.querySelectorAll('[data-topic]').forEach(function(b){b.onclick=function(){S.topic=+b.dataset.topic;S.index=0;S.stage=0;save();train()}})}
-function listenButtons(l){return '<div class="actions"><button id="slow">🔊 Slow</button><button class="alt" id="normal">Normal</button><button class="alt" id="fast">Fast</button><button class="alt" id="mic">🎙 Speak</button></div>'}function answerBox(text){return listenButtons(line())+'<textarea id="answer" class="answer" placeholder="'+text+'"></textarea><div class="actions"><button class="gold" id="check">Check answer</button></div><div id="feedback"></div>'}function drill(l,k){var d={Substitution:['Replace '+l.a+' with '+l.b+'.',l.base.replace(l.a,l.b)],Transformation:['Make a polite question.','Could you help me '+l.a+'?'],Expansion:['Add a time and reason.','I need to '+l.b+' '+l.time+' because '+l.reason+'.'],Response:['Why do you need help?','I need help because '+l.reason+'.'],Combination:['Join the ideas with because.','I need help because I want to understand.'],Reproduction:['Listen and reproduce the model.',l.base]};return d[k]}
-function train(){var l=line(),st=S.stage;$('#tag').textContent=l.level+' · '+l.theme.toUpperCase();$('#title').textContent=l.theme;$('#count').textContent='Mission '+(S.index+1)+' of 50 · '+(S.mastery[l.id]||0)+'% mastery';$('#bar').style.width=((st+1)/7*100)+'%';$('#steps').innerHTML=steps.map(function(x,i){return '<div class="step '+(i===st?'on':i<st?'done':'')+'">'+x+'</div>'}).join('');topics();var h='';if(st===0)h='<p class="mut">Listen 1–3 times. Notice the useful phrase.</p><div class="sentence">'+l.base+'</div><div class="prompt">'+l.hint+'</div>'+listenButtons(l)+'<button id="next" class="gold">Ready to shadow →</button>';if(st===1)h='<p class="mut">Shadow the rhythm. Type mode is always available.</p><div class="sentence">'+l.base+'</div>'+answerBox('Repeat the model exactly.');if(st===2)h='<p class="mut">Complete the hidden words from memory.</p><div class="sentence">'+l.base.split(' ').map(function(x,i){return i%3===1?'____':x}).join(' ')+'</div>'+answerBox('Type the full sentence.');if(st===3)h='<p class="mut">Recall the sentence from the Chinese cue.</p><div class="prompt">'+l.hint+'</div>'+answerBox('Say or type the English sentence.');if(st===4)h='<p class="mut">Produce one accurate final version.</p><div class="sentence">'+l.base+'</div>'+answerBox('One final accurate production.');if(st===5){var names=['Substitution','Transformation','Expansion','Response','Combination','Reproduction'];h='<p class="mut">Complete all six FSI drill types. Choose one and answer.</p><div class="drills">'+names.map(function(n,i){return '<button class="drill '+(!i?'selected':'')+'" data-drill="'+n+'"><b>'+n+'</b><br><small>'+drill(l,n)[0]+'</small></button>'}).join('')+'</div><div id="drillPrompt" class="prompt">'+drill(l,'Substitution')[0]+'</div>'+answerBox('Give the drill answer.')}if(st===6)h='<div class="prompt"><span class="tag">BOSS · 30–90 sec</span><h2>Real-life response</h2><p>In this situation, explain what you need, when you will do it, and why. Use both target actions.</p></div>'+answerBox('Speak or type a complete response using the mission vocabulary.');$('#lesson').innerHTML=h;bind(l)}
-function bind(l){$('#slow')&&($('#slow').onclick=function(){speak(l.base,.7)});$('#normal')&&($('#normal').onclick=function(){speak(l.base,1)});$('#fast')&&($('#fast').onclick=function(){speak(l.base,1.25)});$('#next')&&($('#next').onclick=advance);$('#mic')&&($('#mic').onclick=mic);$('#check')&&($('#check').onclick=function(){check(l)});document.querySelectorAll('[data-drill]').forEach(function(b){b.onclick=function(){document.querySelectorAll('[data-drill]').forEach(function(x){x.classList.remove('selected')});b.classList.add('selected');var q=drill(l,b.dataset.drill);$('#drillPrompt').textContent=q[0];if(b.dataset.drill==='Reproduction')speak(q[1],.85)}})}
-function mic(){var R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R){$('#feedback').innerHTML='<div class="feedback bad">Speech recognition is unavailable here. Use type mode.</div>';return}rec=new R();rec.lang='en-US';rec.continuous=true;rec.interimResults=true;rec.onstart=function(){$('#feedback').innerHTML='<div class="feedback">Listening in American English…</div>'};rec.onresult=function(e){$('#answer').value=[].map.call(e.results,function(x){return x[0].transcript}).join(' ')};rec.onerror=function(){$('#feedback').innerHTML='<div class="feedback bad">Microphone unavailable. Use type mode.</div>'};rec.start()}
-function check(l){var a=$('#answer').value.trim();if(!a)return;var target=l.base;if(S.stage===5)target=drill(l,document.querySelector('.drill.selected').dataset.drill)[1];var r=grade(a,target);if(S.stage===6){var hit=[l.a.split(' ')[0],l.b.split(' ')[0]].filter(function(w){return words(a).includes(w)}).length;r.n=Math.min(100,45+hit*25+Math.min(words(a).length,30))}var feedback='<div class="feedback '+(r.n>=75?'':'bad')+'"><b>'+r.n+'/100 · '+(r.n>=90?'Perfect strike!':r.n>=75?'Continue.':'Repair this before advancing.')+'</b><br><small>Model: '+target+'</small></div>';$('#feedback').innerHTML=feedback;S.mastery[l.id]=Math.max(S.mastery[l.id]||0,r.n);if(r.n<75)S.mistakes.unshift({sentence:target,input:a,score:r.n,theme:l.theme});else{S.xp+=r.n>=90?28:18;S.days[new Date().toISOString().slice(0,10)]=1;save();setTimeout(advance,500)}save()}
-function advance(){if(S.stage<6){S.stage++;save();train();return}S.xp+=40;S.days[new Date().toISOString().slice(0,10)]=1;S.stage=0;S.index=(S.index+1)%50;save();train()}
-function map(){$('#mapNodes').innerHTML=themes.map(function(t,i){return '<div class="node '+(i<=Math.floor(S.xp/180)?'open':'')+'"><b>ZONE '+(i+1)+'</b><br>'+t[0]+'<br><small>'+t[1]+' · '+(i<=Math.floor(S.xp/180)?'Open':'180 EXP needed')+'</small></div>'}).join('');var n=Object.keys(S.days).length;$('#heat').innerHTML=Array.from({length:56},function(_,i){return '<i class="'+(i>=56-n?'on':'')+'"></i>'}).join('')}
-function review(){var m=S.mistakes.slice(0,50);$('#mistakes').innerHTML=m.length?m.map(function(x,i){return '<div class="prompt"><b>'+x.score+'/100 · '+x.theme+'</b><br>'+x.sentence+'<br><small>You said: '+x.input+'</small><div class="actions"><button class="alt" data-hear="'+i+'">Hear</button><button class="gold" data-fix="'+i+'">Mark repaired</button></div></div>'}).join(''):'<p class="mut">No mistakes saved yet.</p>';document.querySelectorAll('[data-hear]').forEach(function(b){b.onclick=function(){speak(m[b.dataset.hear].sentence)}});document.querySelectorAll('[data-fix]').forEach(function(b){b.onclick=function(){S.mistakes.splice(+b.dataset.fix,1);save();review()}})}
-function plan(){$('#blocks').innerHTML=['Warm-up · 20 min','Block 1 · 90 min','Block 2 · 90 min','Block 3 · 90 min','Block 4 · 90 min','Review · 20 min'].map(function(x){return '<div class="kpi">'+x+'</div>'}).join('');var n=focusStart?Math.floor((Date.now()-focusStart)/60000):0;$('#focus').classList.toggle('hide',!focusStart);$('#focus').textContent='Focused block: '+n+' min. Take a 10-minute break after 90 minutes.'}function view(v){document.querySelectorAll('[data-view]').forEach(function(x){x.classList.toggle('active',x.dataset.view===v)});document.querySelectorAll('.view').forEach(function(x){x.classList.toggle('active',x.id===v)});if(v==='map')map();if(v==='review')review();if(v==='plan')plan()}
-document.querySelectorAll('[data-view]').forEach(function(b){b.onclick=function(){view(b.dataset.view)}});$('#start').onclick=function(){if(!focusStart)focusStart=Date.now();plan()};$('#pause').onclick=function(){if(focusStart){S.seconds+=Math.floor((Date.now()-focusStart)/1000);focusStart=0;save();plan()}};$('#import').onclick=function(){try{var a=JSON.parse($('#importBox').value);if(!Array.isArray(a))throw 0;S.custom=S.custom.concat(a);save();$('#message').textContent='Imported '+a.length+' lessons locally.'}catch(e){$('#message').textContent='Invalid JSON array.'}};$('#export').onclick=function(){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,2)],{type:'application/json'}));a.download='operation-fsi-progress.json';a.click()};$('#reset').onclick=function(){if(confirm('Remove saved progress?')){localStorage.removeItem('operationFSI');location.reload()}};setInterval(function(){if(focusStart)plan()},1000);stats();train();
-</script><script>
-(function () {
-	var originalStats = stats;
-	stats = function () {
-		originalStats();
-		var total = S.seconds + (focusStart ? Math.floor((Date.now() - focusStart) / 1000) : 0);
-		$('#clock').textContent = String(Math.floor(total / 60)).padStart(2, '0') + ':' + String(total % 60).padStart(2, '0');
-	};
+<!doctype html>
+<html lang="en">
 
-	var originalSave = save;
-	save = function () {
-		var seen = {};
-		S.mistakes = S.mistakes.filter(function (item) {
-			var key = item.theme + '|' + item.sentence + '|' + item.input;
-			if (seen[key]) return false;
-			seen[key] = true;
-			return true;
-		});
-		originalSave();
-	};
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Operation FSI</title>
+  <style>
+    :root {
+      --b: #0c1020;
+      --c: #171d35;
+      --l: #344064;
+      --i: #f1f4ff;
+      --m: #60e6bd;
+      --g: #ffd166;
+      --u: #aeb8d5;
+      font-family: Inter, system-ui, sans-serif
+    }
 
-	var originalAllLines = allLines;
-	allLines = function (topic) {
-		var generated = originalAllLines(topic);
-		var imported = (S.custom || []).filter(function (item) {
-			return item && item.theme === themes[topic][0] && item.base && item.hint;
-		}).map(function (item, index) {
-			return { id: 'custom-' + topic + '-' + index, theme: item.theme, level: item.level || themes[topic][1], base: item.base, hint: item.hint, a: item.base, b: item.base, time: '', reason: '' };
-		});
-		return generated.concat(imported);
-	};
+    * {
+      box-sizing: border-box
+    }
 
-	var originalAdvance = advance;
-	advance = function () {
-		if (S.stage === 5) {
-			S.drillDone = S.drillDone || {};
-			var selected = document.querySelector('.drill.selected');
-			var name = selected && selected.dataset.drill;
-			if (name) S.drillDone[name] = true;
-			if (Object.keys(S.drillDone).length < 6) {
-				save();
-				train();
-				return;
-			}
-			S.drillDone = {};
-		}
-		originalAdvance();
-	};
+    body {
+      margin: 0;
+      background: radial-gradient(900px 600px at 4% -8%, #322969, transparent 65%), var(--b);
+      color: var(--i)
+    }
 
-	var originalTrain = train;
-	train = function () {
-		originalTrain();
-		stats();
-	};
+    .app {
+      max-width: 1180px;
+      margin: auto;
+      padding: 20px
+    }
 
-	setInterval(stats, 1000);
-})();
-</script><style>
-:root{--b:#f7f8fb;--c:#fff;--l:#e4e8f0;--i:#172033;--m:#176b5b;--g:#b77b11;--u:#667085}body{background:#f7f8fb;color:#172033}.app{max-width:1080px;padding:28px}.head{border-color:#e4e8f0;padding-bottom:22px}.logo{color:#172033;letter-spacing:.07em;font-size:14px}.logo::first-letter{color:#176b5b}.nav{margin:22px 0 16px}.nav button{border:0;color:#667085;padding:8px 10px;border-radius:6px}.nav button.active{background:#e9f5f2;color:#176b5b}.card{background:#fff;border-color:#e4e8f0;border-radius:12px;box-shadow:none}.topic{border-radius:6px;color:#667085}.topic.active{background:#edf7f4;color:#176b5b}.tag{background:#edf7f4;color:#176b5b}.timer{color:#8b5e0c}.bar{background:#edf0f4;height:6px}.bar i{background:#176b5b}.step{border-color:#e4e8f0;color:#667085}.step.on{border-color:#176b5b;color:#176b5b}.step.done{border-color:#b77b11;color:#8b5e0c}.sentence{font-family:Georgia,serif;font-weight:500;color:#111827;max-width:760px}.prompt{background:#f8fafc;border-left-color:#176b5b;color:#344054}.answer{background:#fff;color:#172033;border-color:#d7dde8}.feedback{background:#edf7f4;color:#155647}.bad{background:#fff1f2;color:#9f2f43}.drill,.node,.kpi{background:#fff;color:#344054;border-color:#e4e8f0}.drill.selected{outline-color:#176b5b}.node.open{border-color:#9edaca}.heat i{background:#e9edf3}.heat i.on{background:#65bd9c}button{background:#176b5b;color:#fff;border-radius:7px;padding:9px 13px}button.alt{background:#f0f2f6;color:#344054}button.gold{background:#b77b11;color:#fff}.stats{gap:18px}.stat{color:#667085}.stat b{color:#172033}.side b{font-size:13px;letter-spacing:.05em}.map{gap:12px}.node{min-height:86px}.kpi{font-size:.9rem}
-</style><script>
-document.querySelector('.logo').textContent='AMERICAN ENGLISH STUDIO';
-document.querySelector('.head small').textContent='Focused speaking practice · Standard American English';
-var preferredUSVoice=null;
-function resolveAmericanVoice(){var vs=speechSynthesis.getVoices();preferredUSVoice=vs.find(function(v){return v.lang==='en-US'&&/(Microsoft David|Microsoft Aria|Google US English|Daniel)/i.test(v.name)})||vs.find(function(v){return v.lang==='en-US'})||null}
-resolveAmericanVoice();speechSynthesis.onvoiceschanged=resolveAmericanVoice;
-speak=function(text,rate){speechSynthesis.cancel();resolveAmericanVoice();var u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=rate||1;u.pitch=1;u.volume=1;if(preferredUSVoice)u.voice=preferredUSVoice;speechSynthesis.speak(u)};
-</script><style>
-.fsi{max-width:880px;margin:auto}.fsi-top{display:flex;justify-content:space-between;gap:12px;align-items:center;border-bottom:1px solid #e4e8f0;padding-bottom:14px}.fsi-label{color:#176b5b;font-weight:800;font-size:.75rem;letter-spacing:.09em}.fsi-path{display:flex;gap:6px;overflow:auto;margin:18px 0}.fsi-path i{font-style:normal;font-size:.72rem;color:#667085;white-space:nowrap;padding:6px 8px;border-radius:6px;background:#f2f4f7}.fsi-path i.on{background:#e6f4ef;color:#176b5b;font-weight:800}.fsi-dialogue{background:#fafbfc;border:1px solid #e4e8f0;border-radius:10px;padding:18px;margin:14px 0;line-height:1.75}.fsi-dialogue b{display:inline-block;width:27px;color:#176b5b}.fsi-cue{border-left:3px solid #176b5b;background:#f5faf8;padding:15px;margin:14px 0;border-radius:6px;font-size:1.1rem}.fsi-counter{color:#8b5e0c;font-weight:800}.fsi-rule{font-size:.86rem;color:#667085;margin-top:10px}.fsi-speed{color:#9f2f43;font-weight:800}.fsi-correct{background:#edf7f4;padding:10px;border-radius:7px;color:#176b5b}
-</style><script>
-(function(){
-var fsi={phase:0,drill:0,reps:0,score:0,unit:0},phaseNames=['Dialogue','Mim-Mem','Role recall','Pattern drills','Reflex drill','Transfer'];
-function unit(){var t=themes[fsi.unit],a='Could you help me '+t[2]+'?',b='Sure. What do you need?',c='I need to '+t[3]+' '+t[4]+' because '+t[5]+'.';return{title:t[0],hint:t[6],a:a,b:b,c:c,time:t[4],reason:t[5],drills:[
-['Substitution','Cue: '+t[3],a.replace(t[2],t[3])],
-['Transformation','Cue: Make it a question.',a],
-['Expansion','Cue: Add time and reason.',c],
-['Response','Teacher: What do you need?',c],
-['Combination','Cue: Join with “because I want to understand.”','I need help because I want to understand.'],
-['Reproduction','Cue: Repeat the full response.',c]]}}
-function fSpeak(text,rate){speak(text,rate||.9)}
-function fMarkup(){var u=unit(),p=phaseNames.map(function(x,i){return '<i class="'+(i===fsi.phase?'on':'')+'">'+(i+1)+'. '+x+'</i>'}).join(''),body='';
-if(fsi.phase===0)body='<p class="mut">FSI 先训练一小段完整对话，而不是孤立句子。先完整听，再开口模仿。</p><div class="fsi-dialogue"><div><b>A</b> '+u.a+'</div><div><b>B</b> '+u.b+'</div><div><b>A</b> '+u.c+'</div></div><div class="actions"><button id="fsiListen">听完整对话</button><button class="alt" id="fsiSlow">慢速示范</button><button class="gold" id="fsiNext">我听懂了，继续 →</button></div>';
-if(fsi.phase===1)body='<p class="mut">Mim-Mem：先模仿整句，再从句尾向前搭建。能脱离屏幕说出前不要进入下一步。</p><div class="fsi-cue">标准句：<b>'+u.c+'</b></div><div class="fsi-dialogue">逆向搭建：<br>because '+u.reason+'.<br>'+u.time+' because '+u.reason+'.<br>'+u.c+'</div>'+fsiInput('逐字准确地说出完整句子。');
-if(fsi.phase===2)body='<p class="mut">角色回忆：屏幕只给出对方的话。请凭记忆补出你作为 A 的回应。</p><div class="fsi-cue"><b>B:</b> '+u.b+'</div>'+fsiInput('以 A 的身份回答，不要回看答案。');
-if(fsi.phase===3||fsi.phase===4){var d=u.drills[fsi.drill],speed=fsi.phase===4;body='<p class="mut">'+(speed?'Three-second reflex: answer immediately.':'Teacher cue → student response. Repeat each drill three times correctly before changing drill type.')+'</p><div class="fsi-cue">'+d[0]+'<br><b>'+d[1]+'</b></div><div class="fsi-counter">Correct repetitions: '+fsi.reps+' / 3</div>'+(speed?'<p class="fsi-speed" id="fsiTimer">3.0 seconds</p>':'')+fsiInput('Say or type the response from the cue.');}
-if(fsi.phase===5)body='<p class="mut">Transfer: use the memorized dialogue and patterns in a new, guided situation. This is the communicative step after mechanical FSI drilling.</p><div class="fsi-cue">You are in a '+u.title.toLowerCase()+' situation. Ask for help, state what you need to do, and explain why.</div>'+fsiInput('Use at least two complete sentences from this unit.');
-return '<section class="fsi"><div class="fsi-top"><div><div class="fsi-label">FSI UNIT '+(fsi.unit+1)+' · '+u.title.toUpperCase()+'</div><h1>Dialogue → cue → automatic response</h1></div><button class="alt" id="fsiReset">Restart unit</button></div><div class="fsi-path">'+p+'</div>'+body+'<p class="fsi-rule">FSI rule: the answer stays hidden; hear the cue, respond promptly, receive correction, then repeat until it is automatic.</p><div id="fsiFeedback"></div></section>'}
-function fsiInput(placeholder){return '<div class="actions"><button class="alt" id="fsiHear">Hear model</button><button class="alt" id="fsiMic">Speak</button></div><textarea id="fsiAnswer" class="answer" placeholder="'+placeholder+'"></textarea><div class="actions"><button class="gold" id="fsiCheck">Check and continue</button></div>'}
-function expected(){var u=unit();if(fsi.phase===1||fsi.phase===2)return u.c;if(fsi.phase===3||fsi.phase===4)return u.drills[fsi.drill][2];return u.c}
-function fRender(){var root=document.querySelector('#train');if(!root)return;root.innerHTML=fMarkup();document.querySelector('#fsiListen')&&($('#fsiListen').onclick=function(){var u=unit();fSpeak(u.a,.92);setTimeout(function(){fSpeak(u.b,.92)},2200);setTimeout(function(){fSpeak(u.c,.92)},4000)});document.querySelector('#fsiSlow')&&($('#fsiSlow').onclick=function(){var u=unit();fSpeak(u.a,.7);setTimeout(function(){fSpeak(u.b,.7)},3000);setTimeout(function(){fSpeak(u.c,.7)},5800)});document.querySelector('#fsiNext')&&($('#fsiNext').onclick=function(){fsi.phase=1;fRender()});document.querySelector('#fsiReset').onclick=function(){fsi.phase=0;fsi.drill=0;fsi.reps=0;fRender()};document.querySelector('#fsiHear')&&($('#fsiHear').onclick=function(){fSpeak(expected(),.82)});document.querySelector('#fsiMic')&&($('#fsiMic').onclick=fMic);document.querySelector('#fsiCheck')&&($('#fsiCheck').onclick=fCheck);if(fsi.phase===4)fCountdown()}
-function fMic(){var R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R){document.querySelector('#fsiFeedback').innerHTML='<div class="feedback bad">Speech recognition is unavailable. Use typed response mode.</div>';return}var r=new R();r.lang='en-US';r.interimResults=true;r.continuous=false;r.onresult=function(e){document.querySelector('#fsiAnswer').value=[].map.call(e.results,function(x){return x[0].transcript}).join(' ')};r.onerror=function(){document.querySelector('#fsiFeedback').innerHTML='<div class="feedback bad">Microphone unavailable. Use typed response mode.</div>'};r.start()}
-function fCheck(){var answer=document.querySelector('#fsiAnswer').value.trim();if(!answer)return;var result=grade(answer,expected()),ok=result.n>=82;if(fsi.phase===5){var u=unit(),w=words(answer);ok=w.length>=12&&w.includes(words(u.a)[2]);result.n=ok?88:Math.min(75,40+w.length*2)}var fb=document.querySelector('#fsiFeedback');fb.innerHTML='<div class="feedback '+(ok?'':'bad')+'"><b>'+result.n+'/100 · '+(ok?'Automatic enough.':'Immediate correction: listen and repeat the model.')+'</b><br><small>Model: '+expected()+'</small></div>';if(!ok){fSpeak(expected(),.75);return}fsi.score+=result.n;if(fsi.phase===3||fsi.phase===4){fsi.reps++;if(fsi.reps<3){setTimeout(fRender,450);return}fsi.reps=0;fsi.drill++;if(fsi.drill>=unit().drills.length){fsi.drill=0;fsi.phase++;if(fsi.phase>5)fsi.phase=5}setTimeout(fRender,450);return}if(fsi.phase<5){fsi.phase++;setTimeout(fRender,450)}else{S.xp+=45;S.days[new Date().toISOString().slice(0,10)]=1;save();fb.innerHTML+='<div class="fsi-correct">Unit complete. The dialogue and its patterns are now ready for real use.</div>'}}
-function fCountdown(){var left=30,el=document.querySelector('#fsiTimer'),id=setInterval(function(){left-=.1;if(el)el.textContent=(left/10).toFixed(1)+' seconds';if(left<=0){clearInterval(id);if(document.querySelector('#fsiFeedback'))document.querySelector('#fsiFeedback').innerHTML='<div class="feedback bad">Time. Hear the cue and restart this response.</div>'}},100)}
-function chineseUI(){
-var labels={TRAIN:'FSI 训练',"GROWTH MAP":'学习地图',"MISTAKE BOOK":'错题本',"6H PLAN":'学习计划',CONTENT:'内容库',LEVEL:'等级',EXP:'经验',STREAK:'连续学习',TODAY:'今日',"Restart unit":'重新开始本单元',"Hear model":'听标准示范',Speak:'语音作答',"Check and continue":'检查并继续'};
-document.querySelectorAll('button,.stat').forEach(function(el){var t=el.textContent.trim();if(labels[t])el.textContent=labels[t]});
-var sub=document.querySelector('.head small');if(sub)sub.textContent='沉浸式口语训练 · 标准美式英语';
-}
-document.querySelectorAll('[data-view="train"]').forEach(function(b){b.addEventListener('click',function(){fRender();chineseUI()})});fRender();chineseUI();
-})();
-</script></body></html>
+    .head {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      border-bottom: 1px solid var(--l);
+      padding: 5px 0 17px
+    }
+
+    .logo {
+      font-weight: 950;
+      letter-spacing: .14em;
+      color: var(--m)
+    }
+
+    small,
+    .mut {
+      color: var(--u)
+    }
+
+    .stats {
+      display: flex;
+      gap: 14px
+    }
+
+    .stat {
+      font-size: .7rem;
+      color: var(--u)
+    }
+
+    .stat b {
+      display: block;
+      color: var(--i);
+      font-size: 1rem
+    }
+
+    .nav,
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .nav {
+      margin: 18px 0
+    }
+
+    button,
+    textarea {
+      font: inherit
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      background: var(--m);
+      color: #09251d;
+      font-weight: 800;
+      cursor: pointer
+    }
+
+    button.alt {
+      background: #303957;
+      color: var(--i)
+    }
+
+    button.gold {
+      background: var(--g);
+      color: #332800
+    }
+
+    .nav button {
+      background: transparent;
+      border: 1px solid var(--l);
+      color: var(--u)
+    }
+
+    .nav button.active {
+      border-color: var(--m);
+      color: var(--m)
+    }
+
+    .view {
+      display: none
+    }
+
+    .view.active {
+      display: block
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 18px
+    }
+
+    .card {
+      background: linear-gradient(145deg, #1d2442, #14192d);
+      border: 1px solid var(--l);
+      padding: 20px;
+      border-radius: 18px
+    }
+
+    .topic {
+      width: 100%;
+      display: block;
+      text-align: left;
+      background: transparent;
+      color: var(--u);
+      padding: 9px
+    }
+
+    .topic.active {
+      background: #293253;
+      color: var(--m)
+    }
+
+    .tag {
+      display: inline-block;
+      border-radius: 20px;
+      padding: 4px 9px;
+      background: #302c51;
+      color: #d5cbff;
+      font-size: .72rem;
+      font-weight: 800
+    }
+
+    .timer {
+      float: right;
+      color: var(--g);
+      font-weight: 800
+    }
+
+    .bar {
+      height: 9px;
+      border-radius: 9px;
+      background: #303957;
+      overflow: hidden;
+      margin: 15px 0
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--m), #7aa9ff);
+      transition: .2s
+    }
+
+    .steps {
+      display: flex;
+      gap: 5px;
+      overflow: auto
+    }
+
+    .step {
+      min-width: 105px;
+      color: var(--u);
+      font-size: .75rem;
+      border-bottom: 3px solid var(--l);
+      padding: 8px 3px
+    }
+
+    .step.on {
+      border-color: var(--m);
+      color: var(--m)
+    }
+
+    .step.done {
+      border-color: var(--g);
+      color: var(--g)
+    }
+
+    h1 {
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      margin: 14px 0
+    }
+
+    .sentence {
+      font-size: clamp(1.35rem, 3vw, 2.25rem);
+      line-height: 1.35;
+      margin: 22px 0
+    }
+
+    .prompt {
+      padding: 13px;
+      border-left: 4px solid #79a7ff;
+      background: #11162a;
+      border-radius: 8px;
+      margin: 12px 0
+    }
+
+    .answer {
+      width: 100%;
+      min-height: 90px;
+      background: #0e1323;
+      color: var(--i);
+      border: 1px solid var(--l);
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 12px
+    }
+
+    .feedback {
+      padding: 12px;
+      border-radius: 9px;
+      background: #19382f;
+      color: #d6ffec;
+      margin-top: 12px
+    }
+
+    .bad {
+      background: #412833;
+      color: #ffe0e4
+    }
+
+    .drills,
+    .map,
+    .kpis {
+      display: grid;
+      gap: 10px
+    }
+
+    .drills {
+      grid-template-columns: repeat(2, 1fr)
+    }
+
+    .drill {
+      background: #151a2e;
+      color: var(--i);
+      text-align: left;
+      border: 1px solid var(--l)
+    }
+
+    .drill.selected {
+      outline: 2px solid var(--m)
+    }
+
+    .map {
+      grid-template-columns: repeat(3, 1fr)
+    }
+
+    .node,
+    .kpi {
+      background: #151a2e;
+      border: 1px solid var(--l);
+      border-radius: 11px;
+      padding: 13px;
+      color: var(--u)
+    }
+
+    .node.open {
+      border-color: var(--m);
+      color: var(--i)
+    }
+
+    .kpis {
+      grid-template-columns: repeat(3, 1fr)
+    }
+
+    .heat {
+      display: grid;
+      grid-template-columns: repeat(14, 1fr);
+      gap: 5px
+    }
+
+    .heat i {
+      aspect-ratio: 1;
+      background: #29324e;
+      border-radius: 3px
+    }
+
+    .heat i.on {
+      background: var(--m)
+    }
+
+    .hide {
+      display: none !important
+    }
+
+    @media(max-width:750px) {
+      .layout {
+        grid-template-columns: 1fr
+      }
+
+      .side {
+        display: none
+      }
+
+      .map {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .kpis {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .app {
+        padding: 13px
+      }
+
+      .stats {
+        gap: 7px
+      }
+
+      .drills {
+        grid-template-columns: 1fr
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <header class="head">
+      <div>
+        <div class="logo">⚡ OPERATION FSI</div><small>Canadian life · American English · B1 → B2</small>
+      </div>
+      <div class="stats">
+        <div class="stat">LEVEL<b id="level">1</b></div>
+        <div class="stat">EXP<b id="xp">0</b></div>
+        <div class="stat">STREAK<b id="streak">1 day</b></div>
+        <div class="stat">TODAY<b id="time">00:00</b></div>
+      </div>
+    </header>
+    <nav class="nav"><button class="active" data-view="train">TRAIN</button><button data-view="map">GROWTH
+        MAP</button><button data-view="review">MISTAKE BOOK</button><button data-view="plan">6H PLAN</button><button
+        data-view="library">CONTENT</button></nav>
+    <section id="train" class="view active">
+      <div class="layout">
+        <aside class="card side"><b>12 个主题单元</b>
+          <div id="topics"></div>
+          <p class="mut">每单元 50 个核心句 · 每句六种 FSI 操练 · 本地保存学习记录。</p>
+        </aside>
+        <section class="card"><span class="tag" id="tag"></span><span class="timer" id="clock">00:00</span>
+          <h1 id="title"></h1>
+          <div class="mut" id="count"></div>
+          <div class="bar"><i id="bar"></i></div>
+          <div class="steps" id="steps"></div>
+          <div id="lesson"></div>
+        </section>
+      </div>
+    </section>
+    <section id="map" class="view">
+      <section class="card">
+        <h1>Growth map</h1>
+        <p class="mut">Every zone contains 50 core lines and a Boss mission. Earn 180 EXP to unlock the next zone.</p>
+        <div class="map" id="mapNodes"></div>
+        <h3>Last 56 training days</h3>
+        <div class="heat" id="heat"></div>
+      </section>
+    </section>
+    <section id="review" class="view">
+      <section class="card">
+        <h1>Mistake book</h1>
+        <p class="mut">Answers below 75% return tomorrow for spaced review.</p>
+        <div id="mistakes"></div>
+      </section>
+    </section>
+    <section id="plan" class="view">
+      <section class="card">
+        <h1>Daily intensive plan</h1>
+        <p class="mut">4 × 90 minute sessions plus 20 minutes of correction. Start at 20 minutes and build consistency.
+        </p>
+        <div class="kpis" id="blocks"></div>
+        <div class="actions"><button id="start">Start focus block</button><button class="alt" id="pause">Pause and
+            save</button></div>
+        <p id="focus" class="feedback hide"></p>
+      </section>
+    </section>
+    <section id="library" class="view">
+      <section class="card">
+        <h1>Extensible content pack</h1>
+        <p class="mut">Import extra lessons as JSON: theme, level, base, hint. The current campaign generates 600 core
+          lessons from safe Canadian-life patterns.</p><textarea class="answer" id="importBox"
+          placeholder='[{"theme":"Classroom & homework","level":"B1","base":"I need more time to finish this.","hint":"我需要更多时间完成。"}]'></textarea>
+        <div class="actions"><button id="import">Import</button><button class="alt" id="export">Export
+            progress</button><button class="alt" id="reset">Reset data</button></div>
+        <p id="message" class="mut"></p>
+      </section>
+    </section>
+  </main>
+  <script>
+    var $ = function (s) { return document.querySelector(s) }, steps = ['Listen', 'Shadow', 'Cloze', 'Recall', 'Check', '6 Drills', 'Boss'];
+    var themes = [['Classroom & homework', 'B1', 'ask the teacher', 'finish the assignment', 'after class', 'I want to understand the instructions', '课堂、作业与提问'], ['Campus life', 'B1', 'find the student office', 'join the club', 'before lunch', 'I want to meet new people', '校园与社团'], ['Host family', 'B1', 'use the washroom', 'help with the dishes', 'after dinner', 'I want to be respectful', '寄宿家庭'], ['Friends & small talk', 'B1', 'hang out this weekend', 'get to know you better', 'after school', 'it sounds fun', '交友与闲聊'], ['Shopping & food', 'B1', 'get this to go', 'try the lunch special', 'at Tim Hortons', 'I am in a hurry', '购物与点餐'], ['Transportation', 'B1', 'catch the next bus', 'get downtown', 'before eight', 'I do not want to be late', '公交与出行'], ['Health & care', 'B1+', 'make an appointment', 'describe my symptoms', 'since yesterday', 'I need some advice', '看病与药房'], ['Banking & housing', 'B1+', 'open a student account', 'ask about the rent', 'this afternoon', 'I need to plan my budget', '银行与租房'], ['Part-time work', 'B2', 'apply for the position', 'confirm my availability', 'on weekday evenings', 'I am reliable', '兼职与面试'], ['Exams & study', 'B1+', 'review this chapter', 'explain my reasoning', 'before the test', 'I want to improve my grade', '考试与学习'], ['Activities & hobbies', 'B1', 'try photography', 'practice with the team', 'on Saturday', 'I enjoy learning new skills', '兴趣与活动'], ['Opinions & culture', 'B2', 'share my point of view', 'consider another perspective', 'during the debate', 'the issue is more complex than it seems', '观点与文化']];
+    var american = { colour: 'color', centre: 'center', favourite: 'favorite', organise: 'organize', aluminium: 'aluminum' }, S; try { S = JSON.parse(localStorage.operationFSI) } catch (e) { } S = S || { xp: 0, topic: 0, index: 0, stage: 0, seconds: 0, mistakes: [], days: {}, custom: [], mastery: {} }; var focusStart = 0, rec;
+    function save() { localStorage.operationFSI = JSON.stringify(S); stats() } function allLines(t) { var x = themes[t], forms = [['Could you help me ', '?'], ['I need to ', ' ' + x[4] + '.'], ['I am trying to ', '.'], ['Would it be okay if I ', '?'], ['I plan to ', ' because ' + x[5] + '.'], ['I am not sure how to ', '.'], ['I would appreciate help with ', '.'], ['I have been working on this ', '.'], ['From my point of view, ', ' is important.'], ['Could you repeat that more slowly?', '']]; return Array.from({ length: 50 }, function (_, i) { var f = forms[i % 10], act = i % 2 ? x[3] : x[2]; return { id: t + '-' + i, theme: x[0], level: x[1], base: f[0] + act + f[1], hint: x[6] + ' · ' + (i + 1) + '/50', a: x[2], b: x[3], time: x[4], reason: x[5] } }) }
+    function line() { return allLines(S.topic)[S.index % 50] } function words(s) { return String(s).toLowerCase().replace(/[.,!?;:'"]/g, '').split(/\s+/).map(function (x) { return american[x] || x }).filter(Boolean) } function grade(a, b) { var x = words(a), y = words(b), used = {}, hit = 0; x.forEach(function (w) { var i = y.findIndex(function (z, n) { return z === w && !used[n] }); if (i >= 0) { used[i] = 1; hit++ } }); return { n: Math.round(hit * 100 / Math.max(1, y.length)), y: y, used: used } } function speak(t, r) { speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance(t); u.lang = 'en-US'; u.rate = r || 1; var v = speechSynthesis.getVoices().find(function (x) { return /en-US/i.test(x.lang) }); if (v) u.voice = v; speechSynthesis.speak(u) }
+    function stats() { var m = Math.floor(S.seconds / 60); $('#level').textContent = Math.floor(S.xp / 180) + 1; $('#xp').textContent = S.xp; $('#streak').textContent = Math.max(1, Object.keys(S.days).length) + ' days'; $('#time').textContent = String(m).padStart(2, '0') + ':' + String(S.seconds % 60).padStart(2, '0') }
+    function topics() { $('#topics').innerHTML = themes.map(function (t, i) { return '<button class="topic ' + (i === S.topic ? 'active' : '') + '" data-topic="' + i + '" ' + (i > Math.floor(S.xp / 180) ? 'disabled' : '') + '>' + (i + 1) + '. ' + t[0] + '<br><small>' + t[1] + ' · 50 lines</small></button>' }).join(''); document.querySelectorAll('[data-topic]').forEach(function (b) { b.onclick = function () { S.topic = +b.dataset.topic; S.index = 0; S.stage = 0; save(); train() } }) }
+    function listenButtons(l) { return '<div class="actions"><button id="slow">🔊 Slow</button><button class="alt" id="normal">Normal</button><button class="alt" id="fast">Fast</button><button class="alt" id="mic">🎙 Speak</button></div>' } function answerBox(text) { return listenButtons(line()) + '<textarea id="answer" class="answer" placeholder="' + text + '"></textarea><div class="actions"><button class="gold" id="check">Check answer</button></div><div id="feedback"></div>' } function drill(l, k) { var d = { Substitution: ['Replace ' + l.a + ' with ' + l.b + '.', l.base.replace(l.a, l.b)], Transformation: ['Make a polite question.', 'Could you help me ' + l.a + '?'], Expansion: ['Add a time and reason.', 'I need to ' + l.b + ' ' + l.time + ' because ' + l.reason + '.'], Response: ['Why do you need help?', 'I need help because ' + l.reason + '.'], Combination: ['Join the ideas with because.', 'I need help because I want to understand.'], Reproduction: ['Listen and reproduce the model.', l.base] }; return d[k] }
+    function train() { var l = line(), st = S.stage; $('#tag').textContent = l.level + ' · ' + l.theme.toUpperCase(); $('#title').textContent = l.theme; $('#count').textContent = 'Mission ' + (S.index + 1) + ' of 50 · ' + (S.mastery[l.id] || 0) + '% mastery'; $('#bar').style.width = ((st + 1) / 7 * 100) + '%'; $('#steps').innerHTML = steps.map(function (x, i) { return '<div class="step ' + (i === st ? 'on' : i < st ? 'done' : '') + '">' + x + '</div>' }).join(''); topics(); var h = ''; if (st === 0) h = '<p class="mut">Listen 1–3 times. Notice the useful phrase.</p><div class="sentence">' + l.base + '</div><div class="prompt">' + l.hint + '</div>' + listenButtons(l) + '<button id="next" class="gold">Ready to shadow →</button>'; if (st === 1) h = '<p class="mut">Shadow the rhythm. Type mode is always available.</p><div class="sentence">' + l.base + '</div>' + answerBox('Repeat the model exactly.'); if (st === 2) h = '<p class="mut">Complete the hidden words from memory.</p><div class="sentence">' + l.base.split(' ').map(function (x, i) { return i % 3 === 1 ? '____' : x }).join(' ') + '</div>' + answerBox('Type the full sentence.'); if (st === 3) h = '<p class="mut">Recall the sentence from the Chinese cue.</p><div class="prompt">' + l.hint + '</div>' + answerBox('Say or type the English sentence.'); if (st === 4) h = '<p class="mut">Produce one accurate final version.</p><div class="sentence">' + l.base + '</div>' + answerBox('One final accurate production.'); if (st === 5) { var names = ['Substitution', 'Transformation', 'Expansion', 'Response', 'Combination', 'Reproduction']; h = '<p class="mut">Complete all six FSI drill types. Choose one and answer.</p><div class="drills">' + names.map(function (n, i) { return '<button class="drill ' + (!i ? 'selected' : '') + '" data-drill="' + n + '"><b>' + n + '</b><br><small>' + drill(l, n)[0] + '</small></button>' }).join('') + '</div><div id="drillPrompt" class="prompt">' + drill(l, 'Substitution')[0] + '</div>' + answerBox('Give the drill answer.') } if (st === 6) h = '<div class="prompt"><span class="tag">BOSS · 30–90 sec</span><h2>Real-life response</h2><p>In this situation, explain what you need, when you will do it, and why. Use both target actions.</p></div>' + answerBox('Speak or type a complete response using the mission vocabulary.'); $('#lesson').innerHTML = h; bind(l) }
+    function bind(l) { $('#slow') && ($('#slow').onclick = function () { speak(l.base, .7) }); $('#normal') && ($('#normal').onclick = function () { speak(l.base, 1) }); $('#fast') && ($('#fast').onclick = function () { speak(l.base, 1.25) }); $('#next') && ($('#next').onclick = advance); $('#mic') && ($('#mic').onclick = mic); $('#check') && ($('#check').onclick = function () { check(l) }); document.querySelectorAll('[data-drill]').forEach(function (b) { b.onclick = function () { document.querySelectorAll('[data-drill]').forEach(function (x) { x.classList.remove('selected') }); b.classList.add('selected'); var q = drill(l, b.dataset.drill); $('#drillPrompt').textContent = q[0]; if (b.dataset.drill === 'Reproduction') speak(q[1], .85) } }) }
+    function mic() { var R = window.SpeechRecognition || window.webkitSpeechRecognition; if (!R) { $('#feedback').innerHTML = '<div class="feedback bad">Speech recognition is unavailable here. Use type mode.</div>'; return } rec = new R(); rec.lang = 'en-US'; rec.continuous = true; rec.interimResults = true; rec.onstart = function () { $('#feedback').innerHTML = '<div class="feedback">Listening in American English…</div>' }; rec.onresult = function (e) { $('#answer').value = [].map.call(e.results, function (x) { return x[0].transcript }).join(' ') }; rec.onerror = function () { $('#feedback').innerHTML = '<div class="feedback bad">Microphone unavailable. Use type mode.</div>' }; rec.start() }
+    function check(l) { var a = $('#answer').value.trim(); if (!a) return; var target = l.base; if (S.stage === 5) target = drill(l, document.querySelector('.drill.selected').dataset.drill)[1]; var r = grade(a, target); if (S.stage === 6) { var hit = [l.a.split(' ')[0], l.b.split(' ')[0]].filter(function (w) { return words(a).includes(w) }).length; r.n = Math.min(100, 45 + hit * 25 + Math.min(words(a).length, 30)) } var feedback = '<div class="feedback ' + (r.n >= 75 ? '' : 'bad') + '"><b>' + r.n + '/100 · ' + (r.n >= 90 ? 'Perfect strike!' : r.n >= 75 ? 'Continue.' : 'Repair this before advancing.') + '</b><br><small>Model: ' + target + '</small></div>'; $('#feedback').innerHTML = feedback; S.mastery[l.id] = Math.max(S.mastery[l.id] || 0, r.n); if (r.n < 75) S.mistakes.unshift({ sentence: target, input: a, score: r.n, theme: l.theme }); else { S.xp += r.n >= 90 ? 28 : 18; S.days[new Date().toISOString().slice(0, 10)] = 1; save(); setTimeout(advance, 500) } save() }
+    function advance() { if (S.stage < 6) { S.stage++; save(); train(); return } S.xp += 40; S.days[new Date().toISOString().slice(0, 10)] = 1; S.stage = 0; S.index = (S.index + 1) % 50; save(); train() }
+    function map() { $('#mapNodes').innerHTML = themes.map(function (t, i) { return '<div class="node ' + (i <= Math.floor(S.xp / 180) ? 'open' : '') + '"><b>ZONE ' + (i + 1) + '</b><br>' + t[0] + '<br><small>' + t[1] + ' · ' + (i <= Math.floor(S.xp / 180) ? 'Open' : '180 EXP needed') + '</small></div>' }).join(''); var n = Object.keys(S.days).length; $('#heat').innerHTML = Array.from({ length: 56 }, function (_, i) { return '<i class="' + (i >= 56 - n ? 'on' : '') + '"></i>' }).join('') }
+    function review() { var m = S.mistakes.slice(0, 50); $('#mistakes').innerHTML = m.length ? m.map(function (x, i) { return '<div class="prompt"><b>' + x.score + '/100 · ' + x.theme + '</b><br>' + x.sentence + '<br><small>You said: ' + x.input + '</small><div class="actions"><button class="alt" data-hear="' + i + '">Hear</button><button class="gold" data-fix="' + i + '">Mark repaired</button></div></div>' }).join('') : '<p class="mut">No mistakes saved yet.</p>'; document.querySelectorAll('[data-hear]').forEach(function (b) { b.onclick = function () { speak(m[b.dataset.hear].sentence) } }); document.querySelectorAll('[data-fix]').forEach(function (b) { b.onclick = function () { S.mistakes.splice(+b.dataset.fix, 1); save(); review() } }) }
+    function plan() { $('#blocks').innerHTML = ['Warm-up · 20 min', 'Block 1 · 90 min', 'Block 2 · 90 min', 'Block 3 · 90 min', 'Block 4 · 90 min', 'Review · 20 min'].map(function (x) { return '<div class="kpi">' + x + '</div>' }).join(''); var n = focusStart ? Math.floor((Date.now() - focusStart) / 60000) : 0; $('#focus').classList.toggle('hide', !focusStart); $('#focus').textContent = 'Focused block: ' + n + ' min. Take a 10-minute break after 90 minutes.' } function view(v) { document.querySelectorAll('[data-view]').forEach(function (x) { x.classList.toggle('active', x.dataset.view === v) }); document.querySelectorAll('.view').forEach(function (x) { x.classList.toggle('active', x.id === v) }); if (v === 'map') map(); if (v === 'review') review(); if (v === 'plan') plan() }
+    document.querySelectorAll('[data-view]').forEach(function (b) { b.onclick = function () { view(b.dataset.view) } }); $('#start').onclick = function () { if (!focusStart) focusStart = Date.now(); plan() }; $('#pause').onclick = function () { if (focusStart) { S.seconds += Math.floor((Date.now() - focusStart) / 1000); focusStart = 0; save(); plan() } }; $('#import').onclick = function () { try { var a = JSON.parse($('#importBox').value); if (!Array.isArray(a)) throw 0; S.custom = S.custom.concat(a); save(); $('#message').textContent = 'Imported ' + a.length + ' lessons locally.' } catch (e) { $('#message').textContent = 'Invalid JSON array.' } }; $('#export').onclick = function () { var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(S, null, 2)], { type: 'application/json' })); a.download = 'operation-fsi-progress.json'; a.click() }; $('#reset').onclick = function () { if (confirm('Remove saved progress?')) { localStorage.removeItem('operationFSI'); location.reload() } }; setInterval(function () { if (focusStart) plan() }, 1000); stats(); train();
+  </script>
+  <script>
+    (function () {
+      var originalStats = stats;
+      stats = function () {
+        originalStats();
+        var total = S.seconds + (focusStart ? Math.floor((Date.now() - focusStart) / 1000) : 0);
+        $('#clock').textContent = String(Math.floor(total / 60)).padStart(2, '0') + ':' + String(total % 60).padStart(2, '0');
+      };
+
+      var originalSave = save;
+      save = function () {
+        var seen = {};
+        S.mistakes = S.mistakes.filter(function (item) {
+          var key = item.theme + '|' + item.sentence + '|' + item.input;
+          if (seen[key]) return false;
+          seen[key] = true;
+          return true;
+        });
+        originalSave();
+      };
+
+      var originalAllLines = allLines;
+      allLines = function (topic) {
+        var generated = originalAllLines(topic);
+        var imported = (S.custom || []).filter(function (item) {
+          return item && item.theme === themes[topic][0] && item.base && item.hint;
+        }).map(function (item, index) {
+          return { id: 'custom-' + topic + '-' + index, theme: item.theme, level: item.level || themes[topic][1], base: item.base, hint: item.hint, a: item.base, b: item.base, time: '', reason: '' };
+        });
+        return generated.concat(imported);
+      };
+
+      var originalAdvance = advance;
+      advance = function () {
+        if (S.stage === 5) {
+          S.drillDone = S.drillDone || {};
+          var selected = document.querySelector('.drill.selected');
+          var name = selected && selected.dataset.drill;
+          if (name) S.drillDone[name] = true;
+          if (Object.keys(S.drillDone).length < 6) {
+            save();
+            train();
+            return;
+          }
+          S.drillDone = {};
+        }
+        originalAdvance();
+      };
+
+      var originalTrain = train;
+      train = function () {
+        originalTrain();
+        stats();
+      };
+
+      setInterval(stats, 1000);
+    })();
+  </script>
+  <style>
+    :root {
+      --b: #f7f8fb;
+      --c: #fff;
+      --l: #e4e8f0;
+      --i: #172033;
+      --m: #176b5b;
+      --g: #b77b11;
+      --u: #667085
+    }
+
+    body {
+      background: #f7f8fb;
+      color: #172033
+    }
+
+    .app {
+      max-width: 1080px;
+      padding: 28px
+    }
+
+    .head {
+      border-color: #e4e8f0;
+      padding-bottom: 22px
+    }
+
+    .logo {
+      color: #172033;
+      letter-spacing: .07em;
+      font-size: 14px
+    }
+
+    .logo::first-letter {
+      color: #176b5b
+    }
+
+    .nav {
+      margin: 22px 0 16px
+    }
+
+    .nav button {
+      border: 0;
+      color: #667085;
+      padding: 8px 10px;
+      border-radius: 6px
+    }
+
+    .nav button.active {
+      background: #e9f5f2;
+      color: #176b5b
+    }
+
+    .card {
+      background: #fff;
+      border-color: #e4e8f0;
+      border-radius: 12px;
+      box-shadow: none
+    }
+
+    .topic {
+      border-radius: 6px;
+      color: #667085
+    }
+
+    .topic.active {
+      background: #edf7f4;
+      color: #176b5b
+    }
+
+    .tag {
+      background: #edf7f4;
+      color: #176b5b
+    }
+
+    .timer {
+      color: #8b5e0c
+    }
+
+    .bar {
+      background: #edf0f4;
+      height: 6px
+    }
+
+    .bar i {
+      background: #176b5b
+    }
+
+    .step {
+      border-color: #e4e8f0;
+      color: #667085
+    }
+
+    .step.on {
+      border-color: #176b5b;
+      color: #176b5b
+    }
+
+    .step.done {
+      border-color: #b77b11;
+      color: #8b5e0c
+    }
+
+    .sentence {
+      font-family: Georgia, serif;
+      font-weight: 500;
+      color: #111827;
+      max-width: 760px
+    }
+
+    .prompt {
+      background: #f8fafc;
+      border-left-color: #176b5b;
+      color: #344054
+    }
+
+    .answer {
+      background: #fff;
+      color: #172033;
+      border-color: #d7dde8
+    }
+
+    .feedback {
+      background: #edf7f4;
+      color: #155647
+    }
+
+    .bad {
+      background: #fff1f2;
+      color: #9f2f43
+    }
+
+    .drill,
+    .node,
+    .kpi {
+      background: #fff;
+      color: #344054;
+      border-color: #e4e8f0
+    }
+
+    .drill.selected {
+      outline-color: #176b5b
+    }
+
+    .node.open {
+      border-color: #9edaca
+    }
+
+    .heat i {
+      background: #e9edf3
+    }
+
+    .heat i.on {
+      background: #65bd9c
+    }
+
+    button {
+      background: #176b5b;
+      color: #fff;
+      border-radius: 7px;
+      padding: 9px 13px
+    }
+
+    button.alt {
+      background: #f0f2f6;
+      color: #344054
+    }
+
+    button.gold {
+      background: #b77b11;
+      color: #fff
+    }
+
+    .stats {
+      gap: 18px
+    }
+
+    .stat {
+      color: #667085
+    }
+
+    .stat b {
+      color: #172033
+    }
+
+    .side b {
+      font-size: 13px;
+      letter-spacing: .05em
+    }
+
+    .map {
+      gap: 12px
+    }
+
+    .node {
+      min-height: 86px
+    }
+
+    .kpi {
+      font-size: .9rem
+    }
+  </style>
+  <script>
+    document.querySelector('.logo').textContent = 'AMERICAN ENGLISH STUDIO';
+    document.querySelector('.head small').textContent = 'Focused speaking practice · Standard American English';
+    var preferredUSVoice = null;
+    function resolveAmericanVoice() { var vs = speechSynthesis.getVoices(); preferredUSVoice = vs.find(function (v) { return v.lang === 'en-US' && /(Microsoft David|Microsoft Aria|Google US English|Daniel)/i.test(v.name) }) || vs.find(function (v) { return v.lang === 'en-US' }) || null }
+    resolveAmericanVoice(); speechSynthesis.onvoiceschanged = resolveAmericanVoice;
+    speak = function (text, rate) { speechSynthesis.cancel(); resolveAmericanVoice(); var u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = rate || 1; u.pitch = 1; u.volume = 1; if (preferredUSVoice) u.voice = preferredUSVoice; speechSynthesis.speak(u) };
+  </script>
+  <style>
+    .fsi {
+      max-width: 880px;
+      margin: auto
+    }
+
+    .fsi-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      border-bottom: 1px solid #e4e8f0;
+      padding-bottom: 14px
+    }
+
+    .fsi-label {
+      color: #176b5b;
+      font-weight: 800;
+      font-size: .75rem;
+      letter-spacing: .09em
+    }
+
+    .fsi-path {
+      display: flex;
+      gap: 6px;
+      overflow: auto;
+      margin: 18px 0
+    }
+
+    .fsi-path i {
+      font-style: normal;
+      font-size: .72rem;
+      color: #667085;
+      white-space: nowrap;
+      padding: 6px 8px;
+      border-radius: 6px;
+      background: #f2f4f7
+    }
+
+    .fsi-path i.on {
+      background: #e6f4ef;
+      color: #176b5b;
+      font-weight: 800
+    }
+
+    .fsi-dialogue {
+      background: #fafbfc;
+      border: 1px solid #e4e8f0;
+      border-radius: 10px;
+      padding: 18px;
+      margin: 14px 0;
+      line-height: 1.75
+    }
+
+    .fsi-dialogue b {
+      display: inline-block;
+      width: 27px;
+      color: #176b5b
+    }
+
+    .fsi-cue {
+      border-left: 3px solid #176b5b;
+      background: #f5faf8;
+      padding: 15px;
+      margin: 14px 0;
+      border-radius: 6px;
+      font-size: 1.1rem
+    }
+
+    .fsi-counter {
+      color: #8b5e0c;
+      font-weight: 800
+    }
+
+    .fsi-rule {
+      font-size: .86rem;
+      color: #667085;
+      margin-top: 10px
+    }
+
+    .fsi-speed {
+      color: #9f2f43;
+      font-weight: 800
+    }
+
+    .fsi-correct {
+      background: #edf7f4;
+      padding: 10px;
+      border-radius: 7px;
+      color: #176b5b
+    }
+  </style>
+  <script>
+    (function () {
+      var fsi = { phase: 0, drill: 0, reps: 0, score: 0, unit: 0 }, phaseNames = ['对话听辨 Dialogue', '逆向模仿 Mim-Mem', '角色回忆 Role Recall', '句型操练 Pattern Drills', '限时反射 Reflex', '情境迁移 Transfer'];
+      function unit() {
+        var t = themes[fsi.unit], a = 'Could you help me ' + t[2] + '?', b = 'Sure. What do you need?', c = 'I need to ' + t[3] + ' ' + t[4] + ' because ' + t[5] + '.'; return {
+          title: t[0], hint: t[6], a: a, b: b, c: c, time: t[4], reason: t[5], drills: [
+            ['Substitution', 'Cue: ' + t[3], a.replace(t[2], t[3])],
+            ['Transformation', 'Cue: Make it a question.', a],
+            ['Expansion', 'Cue: Add time and reason.', c],
+            ['Response', 'Teacher: What do you need?', c],
+            ['Combination', 'Cue: Join with “because I want to understand.”', 'I need help because I want to understand.'],
+            ['Reproduction', 'Cue: Repeat the full response.', c]]
+        }
+      }
+      function fSpeak(text, rate) { speak(text, rate || .9) }
+      function fMarkup() {
+        var u = unit(), p = phaseNames.map(function (x, i) { return '<i class="' + (i === fsi.phase ? 'on' : '') + '">' + (i + 1) + '. ' + x + '</i>' }).join(''), body = '';
+        if (fsi.phase === 0) body = '<p class="mut">FSI 先训练一小段完整对话，而不是孤立句子。先完整听，再开口模仿。</p><div class="fsi-dialogue"><div><b>A</b> ' + u.a + '</div><div><b>B</b> ' + u.b + '</div><div><b>A</b> ' + u.c + '</div></div><div class="actions"><button id="fsiListen">听完整对话</button><button class="alt" id="fsiSlow">慢速示范</button><button class="gold" id="fsiNext">我听懂了，继续 →</button></div>';
+        if (fsi.phase === 1) body = '<p class="mut">Mim-Mem：先模仿整句，再从句尾向前搭建。能脱离屏幕说出前不要进入下一步。</p><div class="fsi-cue">标准句：<b>' + u.c + '</b></div><div class="fsi-dialogue">逆向搭建：<br>because ' + u.reason + '.<br>' + u.time + ' because ' + u.reason + '.<br>' + u.c + '</div>' + fsiInput('逐字准确地说出完整句子。');
+        if (fsi.phase === 2) body = '<p class="mut">角色回忆：屏幕只给出对方的话。请凭记忆补出你作为 A 的回应。</p><div class="fsi-cue"><b>B:</b> ' + u.b + '</div>' + fsiInput('以 A 的身份回答，不要回看答案。');
+        if (fsi.phase === 3 || fsi.phase === 4) { var d = u.drills[fsi.drill], speed = fsi.phase === 4; body = '<p class="mut">' + (speed ? 'Three-second reflex: answer immediately.' : 'Teacher cue → student response. Repeat each drill three times correctly before changing drill type.') + '</p><div class="fsi-cue">' + d[0] + '<br><b>' + d[1] + '</b></div><div class="fsi-counter">Correct repetitions: ' + fsi.reps + ' / 3</div>' + (speed ? '<p class="fsi-speed" id="fsiTimer">3.0 seconds</p>' : '') + fsiInput('Say or type the response from the cue.'); }
+        if (fsi.phase === 5) body = '<p class="mut">Transfer: use the memorized dialogue and patterns in a new, guided situation. This is the communicative step after mechanical FSI drilling.</p><div class="fsi-cue">You are in a ' + u.title.toLowerCase() + ' situation. Ask for help, state what you need to do, and explain why.</div>' + fsiInput('Use at least two complete sentences from this unit.');
+        return '<section class="fsi"><div class="fsi-top"><div><div class="fsi-label">FSI 单元 ' + (fsi.unit + 1) + ' · ' + u.title.toUpperCase() + '</div><h1>先听对话 → 听提示作答 → 练成自动反应</h1></div><button class="alt" id="fsiReset">重新开始本单元</button></div><div class="fsi-path">' + p + '</div>' + body + '<p class="fsi-rule">FSI 原则：不显示答案；听到提示后立即回答；获得纠正；重复到不需要思考也能准确说出。</p><div id="fsiFeedback"></div></section>'
+      }
+      function fsiInput(placeholder) { return '<div class="actions"><button class="alt" id="fsiHear">Hear model</button><button class="alt" id="fsiMic">Speak</button></div><textarea id="fsiAnswer" class="answer" placeholder="' + placeholder + '"></textarea><div class="actions"><button class="gold" id="fsiCheck">Check and continue</button></div>' }
+      function expected() { var u = unit(); if (fsi.phase === 1 || fsi.phase === 2) return u.c; if (fsi.phase === 3 || fsi.phase === 4) return u.drills[fsi.drill][2]; return u.c }
+      function fRender() { var root = document.querySelector('#train'); if (!root) return; root.innerHTML = fMarkup(); document.querySelector('#fsiListen') && ($('#fsiListen').onclick = function () { var u = unit(); fSpeak(u.a, .92); setTimeout(function () { fSpeak(u.b, .92) }, 2200); setTimeout(function () { fSpeak(u.c, .92) }, 4000) }); document.querySelector('#fsiSlow') && ($('#fsiSlow').onclick = function () { var u = unit(); fSpeak(u.a, .7); setTimeout(function () { fSpeak(u.b, .7) }, 3000); setTimeout(function () { fSpeak(u.c, .7) }, 5800) }); document.querySelector('#fsiNext') && ($('#fsiNext').onclick = function () { fsi.phase = 1; fRender() }); document.querySelector('#fsiReset').onclick = function () { fsi.phase = 0; fsi.drill = 0; fsi.reps = 0; fRender() }; document.querySelector('#fsiHear') && ($('#fsiHear').onclick = function () { fSpeak(expected(), .82) }); document.querySelector('#fsiMic') && ($('#fsiMic').onclick = fMic); document.querySelector('#fsiCheck') && ($('#fsiCheck').onclick = fCheck); if (fsi.phase === 4) fCountdown() }
+      function fMic() { var R = window.SpeechRecognition || window.webkitSpeechRecognition; if (!R) { document.querySelector('#fsiFeedback').innerHTML = '<div class="feedback bad">Speech recognition is unavailable. Use typed response mode.</div>'; return } var r = new R(); r.lang = 'en-US'; r.interimResults = true; r.continuous = false; r.onresult = function (e) { document.querySelector('#fsiAnswer').value = [].map.call(e.results, function (x) { return x[0].transcript }).join(' ') }; r.onerror = function () { document.querySelector('#fsiFeedback').innerHTML = '<div class="feedback bad">Microphone unavailable. Use typed response mode.</div>' }; r.start() }
+      function fCheck() { var answer = document.querySelector('#fsiAnswer').value.trim(); if (!answer) return; var result = grade(answer, expected()), ok = result.n >= 82; if (fsi.phase === 5) { var u = unit(), w = words(answer); ok = w.length >= 12 && w.includes(words(u.a)[2]); result.n = ok ? 88 : Math.min(75, 40 + w.length * 2) } var fb = document.querySelector('#fsiFeedback'); fb.innerHTML = '<div class="feedback ' + (ok ? '' : 'bad') + '"><b>' + result.n + '/100 · ' + (ok ? 'Automatic enough.' : 'Immediate correction: listen and repeat the model.') + '</b><br><small>Model: ' + expected() + '</small></div>'; if (!ok) { fSpeak(expected(), .75); return } fsi.score += result.n; if (fsi.phase === 3 || fsi.phase === 4) { fsi.reps++; if (fsi.reps < 3) { setTimeout(fRender, 450); return } fsi.reps = 0; fsi.drill++; if (fsi.drill >= unit().drills.length) { fsi.drill = 0; fsi.phase++; if (fsi.phase > 5) fsi.phase = 5 } setTimeout(fRender, 450); return } if (fsi.phase < 5) { fsi.phase++; setTimeout(fRender, 450) } else { S.xp += 45; S.days[new Date().toISOString().slice(0, 10)] = 1; save(); fb.innerHTML += '<div class="fsi-correct">Unit complete. The dialogue and its patterns are now ready for real use.</div>' } }
+      function fCountdown() { var left = 30, el = document.querySelector('#fsiTimer'), id = setInterval(function () { left -= .1; if (el) el.textContent = (left / 10).toFixed(1) + ' seconds'; if (left <= 0) { clearInterval(id); if (document.querySelector('#fsiFeedback')) document.querySelector('#fsiFeedback').innerHTML = '<div class="feedback bad">Time. Hear the cue and restart this response.</div>' } }, 100) }
+      function chineseUI() {
+        var labels = { TRAIN: 'FSI 训练', "GROWTH MAP": '学习地图', "MISTAKE BOOK": '错题本', "6H PLAN": '学习计划', CONTENT: '内容库', LEVEL: '等级', EXP: '经验', STREAK: '连续学习', TODAY: '今日', "Restart unit": '重新开始本单元', "Hear model": '听标准示范', Speak: '语音作答', "Check and continue": '检查并继续' };
+        document.querySelectorAll('button,.stat').forEach(function (el) { var t = el.textContent.trim(); if (labels[t]) el.textContent = labels[t] });
+        var sub = document.querySelector('.head small'); if (sub) sub.textContent = '沉浸式口语训练 · 标准美式英语';
+      }
+      document.querySelectorAll('[data-view="train"]').forEach(function (b) { b.addEventListener('click', function () { fRender(); chineseUI() }) }); fRender(); chineseUI();
+    })();
+  </script>
+</body>
+
+</html>
 
