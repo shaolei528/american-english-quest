@@ -1,5 +1,0 @@
-{
-  "buildCommand": "rm -rf dist && mkdir -p dist && cp index.html dist/index.html",
-  "outputDirectory": "dist",
-  "framework": "vite"
-}
