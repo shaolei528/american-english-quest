@@ -1,0 +1,5 @@
+{
+  "buildCommand": "vinext build",
+  "outputDirectory": "dist",
+  "framework": "vite"
+}
