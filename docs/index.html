@@ -23,5 +23,57 @@ function map(){$('#mapNodes').innerHTML=themes.map(function(t,i){return '<div cl
 function review(){var m=S.mistakes.slice(0,50);$('#mistakes').innerHTML=m.length?m.map(function(x,i){return '<div class="prompt"><b>'+x.score+'/100 · '+x.theme+'</b><br>'+x.sentence+'<br><small>You said: '+x.input+'</small><div class="actions"><button class="alt" data-hear="'+i+'">Hear</button><button class="gold" data-fix="'+i+'">Mark repaired</button></div></div>'}).join(''):'<p class="mut">No mistakes saved yet.</p>';document.querySelectorAll('[data-hear]').forEach(function(b){b.onclick=function(){speak(m[b.dataset.hear].sentence)}});document.querySelectorAll('[data-fix]').forEach(function(b){b.onclick=function(){S.mistakes.splice(+b.dataset.fix,1);save();review()}})}
 function plan(){$('#blocks').innerHTML=['Warm-up · 20 min','Block 1 · 90 min','Block 2 · 90 min','Block 3 · 90 min','Block 4 · 90 min','Review · 20 min'].map(function(x){return '<div class="kpi">'+x+'</div>'}).join('');var n=focusStart?Math.floor((Date.now()-focusStart)/60000):0;$('#focus').classList.toggle('hide',!focusStart);$('#focus').textContent='Focused block: '+n+' min. Take a 10-minute break after 90 minutes.'}function view(v){document.querySelectorAll('[data-view]').forEach(function(x){x.classList.toggle('active',x.dataset.view===v)});document.querySelectorAll('.view').forEach(function(x){x.classList.toggle('active',x.id===v)});if(v==='map')map();if(v==='review')review();if(v==='plan')plan()}
 document.querySelectorAll('[data-view]').forEach(function(b){b.onclick=function(){view(b.dataset.view)}});$('#start').onclick=function(){if(!focusStart)focusStart=Date.now();plan()};$('#pause').onclick=function(){if(focusStart){S.seconds+=Math.floor((Date.now()-focusStart)/1000);focusStart=0;save();plan()}};$('#import').onclick=function(){try{var a=JSON.parse($('#importBox').value);if(!Array.isArray(a))throw 0;S.custom=S.custom.concat(a);save();$('#message').textContent='Imported '+a.length+' lessons locally.'}catch(e){$('#message').textContent='Invalid JSON array.'}};$('#export').onclick=function(){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,2)],{type:'application/json'}));a.download='operation-fsi-progress.json';a.click()};$('#reset').onclick=function(){if(confirm('Remove saved progress?')){localStorage.removeItem('operationFSI');location.reload()}};setInterval(function(){if(focusStart)plan()},1000);stats();train();
+</script><script>
+(function () {
+	var originalStats = stats;
+	stats = function () {
+		originalStats();
+		var total = S.seconds + (focusStart ? Math.floor((Date.now() - focusStart) / 1000) : 0);
+		$('#clock').textContent = String(Math.floor(total / 60)).padStart(2, '0') + ':' + String(total % 60).padStart(2, '0');
+	};
+	var originalSave = save;
+	save = function () {
+		var seen = {};
+		S.mistakes = S.mistakes.filter(function (item) {
+			var key = item.theme + '|' + item.sentence + '|' + item.input;
+			if (seen[key]) return false;
+			seen[key] = true;
+			return true;
+		});
+		originalSave();
+	};
+	var originalAllLines = allLines;
+	allLines = function (topic) {
+		var generated = originalAllLines(topic);
+		var imported = (S.custom || []).filter(function (item) {
+			return item && item.theme === themes[topic][0] && item.base && item.hint;
+		}).map(function (item, index) {
+			return { id: 'custom-' + topic + '-' + index, theme: item.theme, level: item.level || themes[topic][1], base: item.base, hint: item.hint, a: item.base, b: item.base, time: '', reason: '' };
+		});
+		return generated.concat(imported);
+	};
+	var originalAdvance = advance;
+	advance = function () {
+		if (S.stage === 5) {
+			S.drillDone = S.drillDone || {};
+			var selected = document.querySelector('.drill.selected');
+			var name = selected && selected.dataset.drill;
+			if (name) S.drillDone[name] = true;
+			if (Object.keys(S.drillDone).length < 6) {
+				save();
+				train();
+				return;
+			}
+			S.drillDone = {};
+		}
+		originalAdvance();
+	};
+	var originalTrain = train;
+	train = function () {
+		originalTrain();
+		stats();
+	};
+	setInterval(stats, 1000);
+})();
 </script></body></html>
 
