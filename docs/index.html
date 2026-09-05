@@ -31,6 +31,7 @@ document.querySelectorAll('[data-view]').forEach(function(b){b.onclick=function(
 		var total = S.seconds + (focusStart ? Math.floor((Date.now() - focusStart) / 1000) : 0);
 		$('#clock').textContent = String(Math.floor(total / 60)).padStart(2, '0') + ':' + String(total % 60).padStart(2, '0');
 	};
+
 	var originalSave = save;
 	save = function () {
 		var seen = {};
@@ -42,6 +43,7 @@ document.querySelectorAll('[data-view]').forEach(function(b){b.onclick=function(
 		});
 		originalSave();
 	};
+
 	var originalAllLines = allLines;
 	allLines = function (topic) {
 		var generated = originalAllLines(topic);
@@ -52,6 +54,7 @@ document.querySelectorAll('[data-view]').forEach(function(b){b.onclick=function(
 		});
 		return generated.concat(imported);
 	};
+
 	var originalAdvance = advance;
 	advance = function () {
 		if (S.stage === 5) {
@@ -68,12 +71,23 @@ document.querySelectorAll('[data-view]').forEach(function(b){b.onclick=function(
 		}
 		originalAdvance();
 	};
+
 	var originalTrain = train;
 	train = function () {
 		originalTrain();
 		stats();
 	};
+
 	setInterval(stats, 1000);
 })();
+</script><style>
+:root{--b:#f7f8fb;--c:#fff;--l:#e4e8f0;--i:#172033;--m:#176b5b;--g:#b77b11;--u:#667085}body{background:#f7f8fb;color:#172033}.app{max-width:1080px;padding:28px}.head{border-color:#e4e8f0;padding-bottom:22px}.logo{color:#172033;letter-spacing:.07em;font-size:14px}.logo::first-letter{color:#176b5b}.nav{margin:22px 0 16px}.nav button{border:0;color:#667085;padding:8px 10px;border-radius:6px}.nav button.active{background:#e9f5f2;color:#176b5b}.card{background:#fff;border-color:#e4e8f0;border-radius:12px;box-shadow:none}.topic{border-radius:6px;color:#667085}.topic.active{background:#edf7f4;color:#176b5b}.tag{background:#edf7f4;color:#176b5b}.timer{color:#8b5e0c}.bar{background:#edf0f4;height:6px}.bar i{background:#176b5b}.step{border-color:#e4e8f0;color:#667085}.step.on{border-color:#176b5b;color:#176b5b}.step.done{border-color:#b77b11;color:#8b5e0c}.sentence{font-family:Georgia,serif;font-weight:500;color:#111827;max-width:760px}.prompt{background:#f8fafc;border-left-color:#176b5b;color:#344054}.answer{background:#fff;color:#172033;border-color:#d7dde8}.feedback{background:#edf7f4;color:#155647}.bad{background:#fff1f2;color:#9f2f43}.drill,.node,.kpi{background:#fff;color:#344054;border-color:#e4e8f0}.drill.selected{outline-color:#176b5b}.node.open{border-color:#9edaca}.heat i{background:#e9edf3}.heat i.on{background:#65bd9c}button{background:#176b5b;color:#fff;border-radius:7px;padding:9px 13px}button.alt{background:#f0f2f6;color:#344054}button.gold{background:#b77b11;color:#fff}.stats{gap:18px}.stat{color:#667085}.stat b{color:#172033}.side b{font-size:13px;letter-spacing:.05em}.map{gap:12px}.node{min-height:86px}.kpi{font-size:.9rem}
+</style><script>
+document.querySelector('.logo').textContent='AMERICAN ENGLISH STUDIO';
+document.querySelector('.head small').textContent='Focused speaking practice · Standard American English';
+var preferredUSVoice=null;
+function resolveAmericanVoice(){var vs=speechSynthesis.getVoices();preferredUSVoice=vs.find(function(v){return v.lang==='en-US'&&/(Microsoft David|Microsoft Aria|Google US English|Daniel)/i.test(v.name)})||vs.find(function(v){return v.lang==='en-US'})||null}
+resolveAmericanVoice();speechSynthesis.onvoiceschanged=resolveAmericanVoice;
+speak=function(text,rate){speechSynthesis.cancel();resolveAmericanVoice();var u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=rate||1;u.pitch=1;u.volume=1;if(preferredUSVoice)u.voice=preferredUSVoice;speechSynthesis.speak(u)};
 </script></body></html>
 
