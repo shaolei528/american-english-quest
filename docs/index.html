@@ -830,7 +830,61 @@
       document.querySelectorAll('[data-view="train"]').forEach(function (b) { b.addEventListener('click', function () { fRender(); chineseUI() }) }); fRender(); chineseUI();
     })();
   </script>
-</body>
+<script>
+(function () {
+  function renderClock() {
+    var clock = document.querySelector('#clock');
+    if (!clock || !window.S) return;
+    var running = typeof focusStart === 'number' && focusStart ? Math.floor((Date.now() - focusStart) / 1000) : 0;
+    var total = (S.seconds || 0) + running;
+    clock.textContent = String(Math.floor(total / 60)).padStart(2, '0') + ':' + String(total % 60).padStart(2, '0');
+  }
+
+  function pickAmericanVoice() {
+    var voices = speechSynthesis.getVoices();
+    return voices.find(function (v) {
+      return v.lang === 'en-US' && /(Microsoft David|Microsoft Aria|Google US English|Daniel)/i.test(v.name);
+    }) || voices.find(function (v) { return v.lang === 'en-US'; }) || null;
+  }
+
+  window.speak = function (text, rate) {
+    speechSynthesis.cancel();
+    var utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = rate || 1;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+    var voice = pickAmericanVoice();
+    if (voice) utterance.voice = voice;
+    speechSynthesis.speak(utterance);
+  };
+  speechSynthesis.onvoiceschanged = pickAmericanVoice;
+  setInterval(renderClock, 1000);
+  renderClock();
+
+  var importButton = document.querySelector('#import');
+  if (importButton) importButton.onclick = function () {
+    var message = document.querySelector('#message');
+    try {
+      var entries = JSON.parse(document.querySelector('#importBox').value);
+      var knownThemes = themes.map(function (theme) { return theme[0]; });
+      if (!Array.isArray(entries) || !entries.length) throw new Error('请提供至少一条课程。');
+      entries.forEach(function (item, index) {
+        if (!item || typeof item !== 'object' || typeof item.theme !== 'string' || typeof item.base !== 'string' || typeof item.hint !== 'string') {
+          throw new Error('第 ' + (index + 1) + ' 条必须包含 theme、base、hint。');
+        }
+        if (knownThemes.indexOf(item.theme) < 0) throw new Error('第 ' + (index + 1) + ' 条的 theme 必须匹配现有主题。');
+        if (!item.base.trim() || !item.hint.trim()) throw new Error('第 ' + (index + 1) + ' 条不能留空。');
+      });
+      S.custom = (S.custom || []).concat(entries);
+      save();
+      message.textContent = '已导入 ' + entries.length + ' 条课程，并通过格式校验。';
+    } catch (error) {
+      message.textContent = '导入失败：' + error.message;
+    }
+  };
+})();
+</script></body>
 
 </html>
 
