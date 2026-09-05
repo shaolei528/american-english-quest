@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 672" role="img" aria-labelledby="title desc" shape-rendering="crispEdges">
+  <title id="title">Pixel Coach</title>
+  <desc id="desc">A friendly pixel-art American English speaking coach wearing headphones and holding a microphone.</desc>
+  <defs>
+    <linearGradient id="hood" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6ff0cf"/>
+      <stop offset="1" stop-color="#2da9bc"/>
+    </linearGradient>
+    <linearGradient id="shirt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#273c72"/>
+      <stop offset="1" stop-color="#17254e"/>
+    </linearGradient>
+  </defs>
+  <g opacity=".28" fill="#ffffff">
+    <rect x="46" y="96" width="18" height="18"/><rect x="64" y="78" width="18" height="18"/><rect x="522" y="130" width="16" height="16"/><rect x="506" y="146" width="16" height="16"/>
+    <rect x="96" y="234" width="10" height="10"/><rect x="488" y="250" width="12" height="12"/>
+  </g>
+  <ellipse cx="300" cy="624" rx="192" ry="28" fill="#1d6276" opacity=".22"/>
+  <g>
+    <path d="M158 510h284v106H158z" fill="url(#shirt)"/>
+    <path d="M126 570h64v54h-64zM410 570h64v54h-64z" fill="#203361"/>
+    <path d="M174 470h252v64H174z" fill="url(#hood)"/>
+    <path d="M142 238h316v230H142z" fill="#f6ca9a"/>
+    <path d="M166 210h268v54H166z" fill="#1d2d59"/>
+    <path d="M142 238h42v84h-42zM416 238h42v84h-42z" fill="#1d2d59"/>
+    <path d="M182 184h236v40H182z" fill="#314c88"/>
+    <path d="M202 164h196v30H202z" fill="#6ff0cf"/>
+    <path d="M132 264h42v126h-42zM426 264h42v126h-42z" fill="#ffcc66"/>
+    <path d="M112 292h32v72h-32zM456 292h32v72h-32z" fill="#273c72"/>
+    <path d="M126 276h30v18h-30zM444 276h30v18h-30z" fill="#fff6d1"/>
+    <path d="M200 306h66v42h-66zM334 306h66v42h-66z" fill="#fff8e9"/>
+    <path d="M216 316h34v24h-34zM350 316h34v24h-34z" fill="#17254e"/>
+    <path d="M226 316h10v10h-10zM360 316h10v10h-10z" fill="#84f5dc"/>
+    <path d="M266 360h68v18h-68z" fill="#e89e79"/>
+    <path d="M236 402h128v22H236z" fill="#17254e"/>
+    <path d="M258 402h84v12h-84z" fill="#fff6d1"/>
+    <path d="M184 456h42v36h-42zM374 456h42v36h-42z" fill="#f6ca9a"/>
+    <path d="M196 508h208v112H196z" fill="url(#shirt)"/>
+    <path d="M218 508h28l54 54 54-54h28l-82 86z" fill="#6ff0cf"/>
+    <path d="M284 564h32v34h-32z" fill="#ffcc66"/>
+    <path d="M428 412h28v116h-28z" fill="#273c72"/>
+    <path d="M416 392h52v58h-52z" fill="#ff9faf"/>
+    <path d="M424 400h36v36h-36z" fill="#fff8e9"/>
+    <path d="M438 450h8v118h-8z" fill="#17254e"/>
+    <path d="M414 560h56v18h-56z" fill="#17254e"/>
+    <path d="M88 542h104v22H88z" fill="#ff9faf"/><path d="M98 520h22v66H98z" fill="#f6ca9a"/>
+  </g>
+  <g fill="#fff6d1">
+    <rect x="86" y="142" width="14" height="42"/><rect x="72" y="156" width="42" height="14"/>
+    <rect x="500" y="82" width="12" height="36"/><rect x="488" y="94" width="36" height="12"/>
+  </g>
+  <g font-family="monospace" font-weight="900" text-anchor="middle">
+    <text x="300" y="82" font-size="30" fill="#17304f">PIXEL COACH</text>
+    <text x="300" y="112" font-size="17" fill="#287f86">LISTEN · REPEAT · REACT</text>
+  </g>
+</svg>
