@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Operation FSI</title>
+  <title>美式英语 FSI 训练</title>
   <style>
     :root {
       --b: #0c1020;
@@ -348,18 +348,18 @@
   <main class="app">
     <header class="head">
       <div>
-        <div class="logo">⚡ OPERATION FSI</div><small>Canadian life · American English · B1 → B2</small>
+        <div class="logo">⚡ 美式英语 FSI 训练</div><small>中文学习界面 · 标准美式英语 · B1 → B2</small>
       </div>
       <div class="stats">
-        <div class="stat">LEVEL<b id="level">1</b></div>
-        <div class="stat">EXP<b id="xp">0</b></div>
-        <div class="stat">STREAK<b id="streak">1 day</b></div>
-        <div class="stat">TODAY<b id="time">00:00</b></div>
+        <div class="stat">等级<b id="level">1</b></div>
+        <div class="stat">经验<b id="xp">0</b></div>
+        <div class="stat">连续学习<b id="streak">1 day</b></div>
+        <div class="stat">今日<b id="time">00:00</b></div>
       </div>
     </header>
-    <nav class="nav"><button class="active" data-view="train">TRAIN</button><button data-view="map">GROWTH
-        MAP</button><button data-view="review">MISTAKE BOOK</button><button data-view="plan">6H PLAN</button><button
-        data-view="library">CONTENT</button></nav>
+    <nav class="nav"><button class="active" data-view="train">FSI 训练</button><button data-view="map">GROWTH
+        MAP</button><button data-view="review">错题本</button><button data-view="plan">学习计划</button><button
+        data-view="library">内容库</button></nav>
     <section id="train" class="view active">
       <div class="layout">
         <aside class="card side"><b>12 个主题单元</b>
@@ -693,8 +693,8 @@
     }
   </style>
   <script>
-    document.querySelector('.logo').textContent = 'AMERICAN ENGLISH STUDIO';
-    document.querySelector('.head small').textContent = 'Focused speaking practice · Standard American English';
+    document.querySelector('.logo').textContent = '美式英语 FSI 训练';
+    document.querySelector('.head small').textContent = '中文学习界面 · 标准美式英语';
     var preferredUSVoice = null;
     function resolveAmericanVoice() { var vs = speechSynthesis.getVoices(); preferredUSVoice = vs.find(function (v) { return v.lang === 'en-US' && /(Microsoft David|Microsoft Aria|Google US English|Daniel)/i.test(v.name) }) || vs.find(function (v) { return v.lang === 'en-US' }) || null }
     resolveAmericanVoice(); speechSynthesis.onvoiceschanged = resolveAmericanVoice;
@@ -812,18 +812,18 @@
         if (fsi.phase === 0) body = '<p class="mut">FSI 先训练一小段完整对话，而不是孤立句子。先完整听，再开口模仿。</p><div class="fsi-dialogue"><div><b>A</b> ' + u.a + '</div><div><b>B</b> ' + u.b + '</div><div><b>A</b> ' + u.c + '</div></div><div class="actions"><button id="fsiListen">听完整对话</button><button class="alt" id="fsiSlow">慢速示范</button><button class="gold" id="fsiNext">我听懂了，继续 →</button></div>';
         if (fsi.phase === 1) body = '<p class="mut">Mim-Mem：先模仿整句，再从句尾向前搭建。能脱离屏幕说出前不要进入下一步。</p><div class="fsi-cue">标准句：<b>' + u.c + '</b></div><div class="fsi-dialogue">逆向搭建：<br>because ' + u.reason + '.<br>' + u.time + ' because ' + u.reason + '.<br>' + u.c + '</div>' + fsiInput('逐字准确地说出完整句子。');
         if (fsi.phase === 2) body = '<p class="mut">角色回忆：屏幕只给出对方的话。请凭记忆补出你作为 A 的回应。</p><div class="fsi-cue"><b>B:</b> ' + u.b + '</div>' + fsiInput('以 A 的身份回答，不要回看答案。');
-        if (fsi.phase === 3 || fsi.phase === 4) { var d = u.drills[fsi.drill], speed = fsi.phase === 4; body = '<p class="mut">' + (speed ? 'Three-second reflex: answer immediately.' : 'Teacher cue → student response. Repeat each drill three times correctly before changing drill type.') + '</p><div class="fsi-cue">' + d[0] + '<br><b>' + d[1] + '</b></div><div class="fsi-counter">Correct repetitions: ' + fsi.reps + ' / 3</div>' + (speed ? '<p class="fsi-speed" id="fsiTimer">3.0 seconds</p>' : '') + fsiInput('Say or type the response from the cue.'); }
-        if (fsi.phase === 5) body = '<p class="mut">Transfer: use the memorized dialogue and patterns in a new, guided situation. This is the communicative step after mechanical FSI drilling.</p><div class="fsi-cue">You are in a ' + u.title.toLowerCase() + ' situation. Ask for help, state what you need to do, and explain why.</div>' + fsiInput('Use at least two complete sentences from this unit.');
-        return '<section class="fsi"><div class="fsi-top"><div><div class="fsi-label">FSI 单元 ' + (fsi.unit + 1) + ' · ' + u.title.toUpperCase() + '</div><h1>先听对话 → 听提示作答 → 练成自动反应</h1></div><button class="alt" id="fsiReset">重新开始本单元</button></div><div class="fsi-path">' + p + '</div>' + body + '<p class="fsi-rule">FSI 原则：不显示答案；听到提示后立即回答；获得纠正；重复到不需要思考也能准确说出。</p><div id="fsiFeedback"></div></section>'
+        if (fsi.phase === 3 || fsi.phase === 4) { var d = u.drills[fsi.drill], speed = fsi.phase === 4; body = '<p class="mut">' + (speed ? '三秒限时反射：听到提示后立刻回答。' : '教师提示 → 学员回答。每种操练连续正确三次，才可切换下一种。') + '</p><div class="fsi-cue">' + d[0] + '<br><b>' + d[1] + '</b></div><div class="fsi-counter">连续正确次数：' + fsi.reps + ' / 3</div>' + (speed ? '<p class="fsi-speed" id="fsiTimer">3.0 seconds</p>' : '') + fsiInput('根据提示说出或输入回答。'); }
+        if (fsi.phase === 5) body = '<p class="mut">情境迁移：在新的引导情境中运用已记住的对话和句型。这一步安排在机械操练之后。</p><div class="fsi-cue">你现在处于 ' + u.title.toLowerCase() + ' 的情境。请先寻求帮助，再说明你要做什么以及原因。</div>' + fsiInput('请使用本单元至少两个完整句子。');
+        return '<section class="fsi"><div class="fsi-top"><div><div class="fsi-label">中文学习界面 · FSI 单元 ' + (fsi.unit + 1) + ' · ' + u.title.toUpperCase() + '</div><h1>先听对话 → 听提示作答 → 练成自动反应</h1></div><button class="alt" id="fsiReset">重新开始本单元</button></div><div class="fsi-path">' + p + '</div>' + body + '<p class="fsi-rule">FSI 原则：不显示答案；听到提示后立即回答；获得纠正；重复到不需要思考也能准确说出。</p><div id="fsiFeedback"></div></section>'
       }
-      function fsiInput(placeholder) { return '<div class="actions"><button class="alt" id="fsiHear">Hear model</button><button class="alt" id="fsiMic">Speak</button></div><textarea id="fsiAnswer" class="answer" placeholder="' + placeholder + '"></textarea><div class="actions"><button class="gold" id="fsiCheck">Check and continue</button></div>' }
+      function fsiInput(placeholder) { return '<div class="actions"><button class="alt" id="fsiHear">听标准示范</button><button class="alt" id="fsiMic">Speak</button></div><textarea id="fsiAnswer" class="answer" placeholder="' + placeholder + '"></textarea><div class="actions"><button class="gold" id="fsiCheck">检查并继续</button></div>' }
       function expected() { var u = unit(); if (fsi.phase === 1 || fsi.phase === 2) return u.c; if (fsi.phase === 3 || fsi.phase === 4) return u.drills[fsi.drill][2]; return u.c }
       function fRender() { var root = document.querySelector('#train'); if (!root) return; root.innerHTML = fMarkup(); document.querySelector('#fsiListen') && ($('#fsiListen').onclick = function () { var u = unit(); fSpeak(u.a, .92); setTimeout(function () { fSpeak(u.b, .92) }, 2200); setTimeout(function () { fSpeak(u.c, .92) }, 4000) }); document.querySelector('#fsiSlow') && ($('#fsiSlow').onclick = function () { var u = unit(); fSpeak(u.a, .7); setTimeout(function () { fSpeak(u.b, .7) }, 3000); setTimeout(function () { fSpeak(u.c, .7) }, 5800) }); document.querySelector('#fsiNext') && ($('#fsiNext').onclick = function () { fsi.phase = 1; fRender() }); document.querySelector('#fsiReset').onclick = function () { fsi.phase = 0; fsi.drill = 0; fsi.reps = 0; fRender() }; document.querySelector('#fsiHear') && ($('#fsiHear').onclick = function () { fSpeak(expected(), .82) }); document.querySelector('#fsiMic') && ($('#fsiMic').onclick = fMic); document.querySelector('#fsiCheck') && ($('#fsiCheck').onclick = fCheck); if (fsi.phase === 4) fCountdown() }
-      function fMic() { var R = window.SpeechRecognition || window.webkitSpeechRecognition; if (!R) { document.querySelector('#fsiFeedback').innerHTML = '<div class="feedback bad">Speech recognition is unavailable. Use typed response mode.</div>'; return } var r = new R(); r.lang = 'en-US'; r.interimResults = true; r.continuous = false; r.onresult = function (e) { document.querySelector('#fsiAnswer').value = [].map.call(e.results, function (x) { return x[0].transcript }).join(' ') }; r.onerror = function () { document.querySelector('#fsiFeedback').innerHTML = '<div class="feedback bad">Microphone unavailable. Use typed response mode.</div>' }; r.start() }
-      function fCheck() { var answer = document.querySelector('#fsiAnswer').value.trim(); if (!answer) return; var result = grade(answer, expected()), ok = result.n >= 82; if (fsi.phase === 5) { var u = unit(), w = words(answer); ok = w.length >= 12 && w.includes(words(u.a)[2]); result.n = ok ? 88 : Math.min(75, 40 + w.length * 2) } var fb = document.querySelector('#fsiFeedback'); fb.innerHTML = '<div class="feedback ' + (ok ? '' : 'bad') + '"><b>' + result.n + '/100 · ' + (ok ? 'Automatic enough.' : 'Immediate correction: listen and repeat the model.') + '</b><br><small>Model: ' + expected() + '</small></div>'; if (!ok) { fSpeak(expected(), .75); return } fsi.score += result.n; if (fsi.phase === 3 || fsi.phase === 4) { fsi.reps++; if (fsi.reps < 3) { setTimeout(fRender, 450); return } fsi.reps = 0; fsi.drill++; if (fsi.drill >= unit().drills.length) { fsi.drill = 0; fsi.phase++; if (fsi.phase > 5) fsi.phase = 5 } setTimeout(fRender, 450); return } if (fsi.phase < 5) { fsi.phase++; setTimeout(fRender, 450) } else { S.xp += 45; S.days[new Date().toISOString().slice(0, 10)] = 1; save(); fb.innerHTML += '<div class="fsi-correct">Unit complete. The dialogue and its patterns are now ready for real use.</div>' } }
-      function fCountdown() { var left = 30, el = document.querySelector('#fsiTimer'), id = setInterval(function () { left -= .1; if (el) el.textContent = (left / 10).toFixed(1) + ' seconds'; if (left <= 0) { clearInterval(id); if (document.querySelector('#fsiFeedback')) document.querySelector('#fsiFeedback').innerHTML = '<div class="feedback bad">Time. Hear the cue and restart this response.</div>' } }, 100) }
+      function fMic() { var R = window.SpeechRecognition || window.webkitSpeechRecognition; if (!R) { document.querySelector('#fsiFeedback').innerHTML = '<div class="feedback bad">语音识别不可用，请使用输入模式。</div>'; return } var r = new R(); r.lang = 'en-US'; r.interimResults = true; r.continuous = false; r.onresult = function (e) { document.querySelector('#fsiAnswer').value = [].map.call(e.results, function (x) { return x[0].transcript }).join(' ') }; r.onerror = function () { document.querySelector('#fsiFeedback').innerHTML = '<div class="feedback bad">麦克风不可用，请使用输入模式。</div>' }; r.start() }
+      function fCheck() { var answer = document.querySelector('#fsiAnswer').value.trim(); if (!answer) return; var result = grade(answer, expected()), ok = result.n >= 82; if (fsi.phase === 5) { var u = unit(), w = words(answer); ok = w.length >= 12 && w.includes(words(u.a)[2]); result.n = ok ? 88 : Math.min(75, 40 + w.length * 2) } var fb = document.querySelector('#fsiFeedback'); fb.innerHTML = '<div class="feedback ' + (ok ? '' : 'bad') + '"><b>' + result.n + '/100 · ' + (ok ? '达到自动反应标准。' : '立即纠正：先听标准示范，再重复。') + '</b><br><small>Model: ' + expected() + '</small></div>'; if (!ok) { fSpeak(expected(), .75); return } fsi.score += result.n; if (fsi.phase === 3 || fsi.phase === 4) { fsi.reps++; if (fsi.reps < 3) { setTimeout(fRender, 450); return } fsi.reps = 0; fsi.drill++; if (fsi.drill >= unit().drills.length) { fsi.drill = 0; fsi.phase++; if (fsi.phase > 5) fsi.phase = 5 } setTimeout(fRender, 450); return } if (fsi.phase < 5) { fsi.phase++; setTimeout(fRender, 450) } else { S.xp += 45; S.days[new Date().toISOString().slice(0, 10)] = 1; save(); fb.innerHTML += '<div class="fsi-correct">单元完成。你已可以把这段对话和句型用于真实情境。</div>' } }
+      function fCountdown() { var left = 30, el = document.querySelector('#fsiTimer'), id = setInterval(function () { left -= .1; if (el) el.textContent = (left / 10).toFixed(1) + ' seconds'; if (left <= 0) { clearInterval(id); if (document.querySelector('#fsiFeedback')) document.querySelector('#fsiFeedback').innerHTML = '<div class="feedback bad">时间到。请听提示后重新回答。</div>' } }, 100) }
       function chineseUI() {
-        var labels = { TRAIN: 'FSI 训练', "GROWTH MAP": '学习地图', "MISTAKE BOOK": '错题本', "6H PLAN": '学习计划', CONTENT: '内容库', LEVEL: '等级', EXP: '经验', STREAK: '连续学习', TODAY: '今日', "Restart unit": '重新开始本单元', "Hear model": '听标准示范', Speak: '语音作答', "Check and continue": '检查并继续' };
+        var labels = { TRAIN: 'FSI 训练', "GROWTH MAP": '学习地图', "MISTAKE BOOK": '错题本', "6H PLAN": '学习计划', CONTENT: '内容库', LEVEL: '等级', EXP: '经验', STREAK: '连续学习', TODAY: '今日', "Restart unit": '重新开始本单元', "听标准示范": '听标准示范', Speak: '语音作答', "检查并继续": '检查并继续' };
         document.querySelectorAll('button,.stat').forEach(function (el) { var t = el.textContent.trim(); if (labels[t]) el.textContent = labels[t] });
         var sub = document.querySelector('.head small'); if (sub) sub.textContent = '沉浸式口语训练 · 标准美式英语';
       }
